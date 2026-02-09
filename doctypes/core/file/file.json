@@ -1,0 +1,108 @@
+{
+  "name": "File",
+  "module": "Core",
+  "naming_rule": "hash",
+  "is_submittable": false,
+  "is_child": false,
+  "is_single": false,
+  "is_tree": false,
+  "is_virtual": false,
+  "title_field": "file_name",
+  "search_fields": ["file_name", "attached_to_doctype"],
+  "fields": [
+    {
+      "fieldname": "file_name",
+      "fieldtype": "Data",
+      "label": "File Name",
+      "reqd": true,
+      "max_length": 255,
+      "in_list_view": true
+    },
+    {
+      "fieldname": "file_url",
+      "fieldtype": "Data",
+      "label": "File URL",
+      "max_length": 512,
+      "in_list_view": true,
+      "description": "Path or URL to the file"
+    },
+    {
+      "fieldname": "file_size",
+      "fieldtype": "Int",
+      "label": "File Size",
+      "description": "File size in bytes"
+    },
+    {
+      "fieldname": "file_type",
+      "fieldtype": "Data",
+      "label": "File Type",
+      "max_length": 100,
+      "description": "MIME type (e.g., image/png, application/pdf)"
+    },
+    {
+      "fieldname": "is_private",
+      "fieldtype": "Check",
+      "label": "Is Private",
+      "default": false,
+      "description": "Private files require authentication to access"
+    },
+    {
+      "fieldname": "is_folder",
+      "fieldtype": "Check",
+      "label": "Is Folder",
+      "default": false
+    },
+    {
+      "fieldname": "folder",
+      "fieldtype": "Link",
+      "label": "Folder",
+      "options": "File",
+      "description": "Parent folder"
+    },
+    {
+      "fieldname": "attached_to_doctype",
+      "fieldtype": "Data",
+      "label": "Attached To DocType",
+      "max_length": 140,
+      "in_list_view": true,
+      "description": "DocType this file is attached to"
+    },
+    {
+      "fieldname": "attached_to_name",
+      "fieldtype": "Data",
+      "label": "Attached To Name",
+      "max_length": 255,
+      "description": "Document name this file is attached to"
+    },
+    {
+      "fieldname": "attached_to_field",
+      "fieldtype": "Data",
+      "label": "Attached To Field",
+      "max_length": 140,
+      "description": "Field name this file is attached to"
+    },
+    {
+      "fieldname": "thumbnail_url",
+      "fieldtype": "Data",
+      "label": "Thumbnail URL",
+      "max_length": 512,
+      "description": "URL to thumbnail (for images)"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": true,
+      "write": true,
+      "create": true,
+      "delete": true
+    },
+    {
+      "role": "All",
+      "read": true,
+      "write": true,
+      "create": true,
+      "if_owner": true
+    }
+  ]
+}

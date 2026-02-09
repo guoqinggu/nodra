@@ -1,0 +1,58 @@
+{
+  "name": "Role",
+  "module": "Core",
+  "naming_rule": "field",
+  "naming_field": "role_name",
+  "is_submittable": false,
+  "is_child": false,
+  "is_single": false,
+  "is_tree": false,
+  "is_virtual": false,
+  "title_field": "role_name",
+  "search_fields": ["role_name"],
+  "fields": [
+    {
+      "fieldname": "role_name",
+      "fieldtype": "Data",
+      "label": "Role Name",
+      "reqd": true,
+      "unique": true,
+      "max_length": 140,
+      "in_list_view": true
+    },
+    {
+      "fieldname": "disabled",
+      "fieldtype": "Check",
+      "label": "Disabled",
+      "default": false
+    },
+    {
+      "fieldname": "desk_access",
+      "fieldtype": "Check",
+      "label": "Desk Access",
+      "default": true,
+      "description": "Allow users with this role to access the system"
+    },
+    {
+      "fieldname": "is_custom",
+      "fieldtype": "Check",
+      "label": "Is Custom",
+      "default": true,
+      "read_only": true,
+      "description": "Whether this is a custom role (vs system role)"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": true,
+      "write": true,
+      "create": true,
+      "delete": true
+    },
+    {
+      "role": "All",
+      "read": true
+    }
+  ]
+}

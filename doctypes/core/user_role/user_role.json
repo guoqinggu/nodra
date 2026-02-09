@@ -1,0 +1,21 @@
+{
+  "name": "User Role",
+  "module": "Core",
+  "naming_rule": "autoincrement",
+  "is_submittable": false,
+  "is_child": true,
+  "is_single": false,
+  "is_tree": false,
+  "is_virtual": false,
+  "fields": [
+    {
+      "fieldname": "role",
+      "fieldtype": "Link",
+      "label": "Role",
+      "options": "Role",
+      "reqd": true,
+      "in_list_view": true
+    }
+  ],
+  "permissions": []
+}

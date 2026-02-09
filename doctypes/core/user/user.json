@@ -1,0 +1,117 @@
+{
+  "name": "User",
+  "module": "Core",
+  "naming_rule": "field",
+  "naming_field": "email",
+  "is_submittable": false,
+  "is_child": false,
+  "is_single": false,
+  "is_tree": false,
+  "is_virtual": false,
+  "title_field": "full_name",
+  "search_fields": ["full_name", "email"],
+  "fields": [
+    {
+      "fieldname": "email",
+      "fieldtype": "Data",
+      "label": "Email",
+      "reqd": true,
+      "unique": true,
+      "max_length": 255,
+      "description": "User's email address (used as unique identifier)"
+    },
+    {
+      "fieldname": "first_name",
+      "fieldtype": "Data",
+      "label": "First Name",
+      "reqd": true,
+      "max_length": 100
+    },
+    {
+      "fieldname": "last_name",
+      "fieldtype": "Data",
+      "label": "Last Name",
+      "max_length": 100
+    },
+    {
+      "fieldname": "full_name",
+      "fieldtype": "Data",
+      "label": "Full Name",
+      "max_length": 255,
+      "read_only": true,
+      "in_list_view": true,
+      "description": "Auto-generated from first and last name"
+    },
+    {
+      "fieldname": "enabled",
+      "fieldtype": "Check",
+      "label": "Enabled",
+      "default": true,
+      "description": "Whether the user account is active"
+    },
+    {
+      "fieldname": "password",
+      "fieldtype": "Password",
+      "label": "Password",
+      "hidden": true,
+      "description": "Hashed password (never returned in API responses)"
+    },
+    {
+      "fieldname": "api_key",
+      "fieldtype": "Data",
+      "label": "API Key",
+      "max_length": 255,
+      "read_only": true,
+      "hidden": true
+    },
+    {
+      "fieldname": "api_secret",
+      "fieldtype": "Password",
+      "label": "API Secret",
+      "hidden": true,
+      "read_only": true
+    },
+    {
+      "fieldname": "last_login",
+      "fieldtype": "Datetime",
+      "label": "Last Login",
+      "read_only": true
+    },
+    {
+      "fieldname": "last_ip",
+      "fieldtype": "Data",
+      "label": "Last IP Address",
+      "max_length": 45,
+      "read_only": true
+    },
+    {
+      "fieldname": "user_type",
+      "fieldtype": "Select",
+      "label": "User Type",
+      "options": ["System User", "Website User"],
+      "default": "System User",
+      "reqd": true
+    },
+    {
+      "fieldname": "roles",
+      "fieldtype": "Table",
+      "label": "Roles",
+      "options": "User Role",
+      "description": "Roles assigned to this user"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": true,
+      "write": true,
+      "create": true,
+      "delete": true
+    },
+    {
+      "role": "All",
+      "read": true,
+      "if_owner": true
+    }
+  ]
+}

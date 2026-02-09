@@ -1,0 +1,73 @@
+{
+  "name": "DocPerm",
+  "module": "Core",
+  "naming_rule": "autoincrement",
+  "is_submittable": false,
+  "is_child": true,
+  "is_single": false,
+  "is_tree": false,
+  "is_virtual": false,
+  "fields": [
+    {
+      "fieldname": "role",
+      "fieldtype": "Link",
+      "label": "Role",
+      "options": "Role",
+      "reqd": true,
+      "in_list_view": true
+    },
+    {
+      "fieldname": "read",
+      "fieldtype": "Check",
+      "label": "Read",
+      "default": false,
+      "in_list_view": true
+    },
+    {
+      "fieldname": "write",
+      "fieldtype": "Check",
+      "label": "Write",
+      "default": false,
+      "in_list_view": true
+    },
+    {
+      "fieldname": "create",
+      "fieldtype": "Check",
+      "label": "Create",
+      "default": false,
+      "in_list_view": true
+    },
+    {
+      "fieldname": "delete",
+      "fieldtype": "Check",
+      "label": "Delete",
+      "default": false
+    },
+    {
+      "fieldname": "submit",
+      "fieldtype": "Check",
+      "label": "Submit",
+      "default": false
+    },
+    {
+      "fieldname": "cancel",
+      "fieldtype": "Check",
+      "label": "Cancel",
+      "default": false
+    },
+    {
+      "fieldname": "amend",
+      "fieldtype": "Check",
+      "label": "Amend",
+      "default": false
+    },
+    {
+      "fieldname": "if_owner",
+      "fieldtype": "Check",
+      "label": "If Owner",
+      "default": false,
+      "description": "Only apply these permissions if user is the document owner"
+    }
+  ],
+  "permissions": []
+}

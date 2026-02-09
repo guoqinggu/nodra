@@ -1,0 +1,136 @@
+{
+  "name": "DocType",
+  "module": "Core",
+  "naming_rule": "field",
+  "naming_field": "name",
+  "is_submittable": false,
+  "is_child": false,
+  "is_single": false,
+  "is_tree": false,
+  "is_virtual": false,
+  "title_field": "name",
+  "search_fields": ["name", "module"],
+  "fields": [
+    {
+      "fieldname": "name",
+      "fieldtype": "Data",
+      "label": "Name",
+      "reqd": true,
+      "unique": true,
+      "max_length": 140,
+      "in_list_view": true,
+      "description": "DocType name (e.g., 'Todo', 'Sales Invoice')"
+    },
+    {
+      "fieldname": "module",
+      "fieldtype": "Data",
+      "label": "Module",
+      "reqd": true,
+      "max_length": 140,
+      "in_list_view": true
+    },
+    {
+      "fieldname": "naming_rule",
+      "fieldtype": "Select",
+      "label": "Naming Rule",
+      "options": ["autoincrement", "hash", "field", "format", "prompt", "expression"],
+      "default": "autoincrement",
+      "reqd": true
+    },
+    {
+      "fieldname": "naming_field",
+      "fieldtype": "Data",
+      "label": "Naming Field",
+      "max_length": 140,
+      "description": "Field to use for naming (when naming_rule is 'field')"
+    },
+    {
+      "fieldname": "naming_format",
+      "fieldtype": "Data",
+      "label": "Naming Format",
+      "max_length": 140,
+      "description": "Format string (e.g., 'TODO-{####}') when naming_rule is 'format'"
+    },
+    {
+      "fieldname": "is_submittable",
+      "fieldtype": "Check",
+      "label": "Is Submittable",
+      "default": false
+    },
+    {
+      "fieldname": "is_child",
+      "fieldtype": "Check",
+      "label": "Is Child Table",
+      "default": false
+    },
+    {
+      "fieldname": "is_single",
+      "fieldtype": "Check",
+      "label": "Is Single",
+      "default": false,
+      "description": "Single document (e.g., Settings)"
+    },
+    {
+      "fieldname": "is_tree",
+      "fieldtype": "Check",
+      "label": "Is Tree",
+      "default": false,
+      "description": "Tree structure (parent-child hierarchy)"
+    },
+    {
+      "fieldname": "is_virtual",
+      "fieldtype": "Check",
+      "label": "Is Virtual",
+      "default": false,
+      "description": "No database table (computed)"
+    },
+    {
+      "fieldname": "title_field",
+      "fieldtype": "Data",
+      "label": "Title Field",
+      "max_length": 140,
+      "description": "Field to use as document title"
+    },
+    {
+      "fieldname": "sort_field",
+      "fieldtype": "Data",
+      "label": "Default Sort Field",
+      "max_length": 140,
+      "default": "modified"
+    },
+    {
+      "fieldname": "sort_order",
+      "fieldtype": "Select",
+      "label": "Default Sort Order",
+      "options": ["asc", "desc"],
+      "default": "desc"
+    },
+    {
+      "fieldname": "fields",
+      "fieldtype": "Table",
+      "label": "Fields",
+      "options": "DocField",
+      "description": "Field definitions for this DocType"
+    },
+    {
+      "fieldname": "permissions",
+      "fieldtype": "Table",
+      "label": "Permissions",
+      "options": "DocPerm",
+      "description": "Permission rules for this DocType"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": true,
+      "write": true,
+      "create": true,
+      "delete": true
+    },
+    {
+      "role": "All",
+      "read": true
+    }
+  ]
+}

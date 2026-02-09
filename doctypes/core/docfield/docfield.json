@@ -1,0 +1,137 @@
+{
+  "name": "DocField",
+  "module": "Core",
+  "naming_rule": "autoincrement",
+  "is_submittable": false,
+  "is_child": true,
+  "is_single": false,
+  "is_tree": false,
+  "is_virtual": false,
+  "fields": [
+    {
+      "fieldname": "fieldname",
+      "fieldtype": "Data",
+      "label": "Field Name",
+      "reqd": true,
+      "max_length": 140,
+      "in_list_view": true,
+      "description": "Column name (snake_case)"
+    },
+    {
+      "fieldname": "fieldtype",
+      "fieldtype": "Select",
+      "label": "Field Type",
+      "options": [
+        "Data",
+        "Int",
+        "Float",
+        "Currency",
+        "Date",
+        "Datetime",
+        "Time",
+        "Text",
+        "LongText",
+        "SmallText",
+        "Check",
+        "Select",
+        "Link",
+        "DynamicLink",
+        "Table",
+        "Attach",
+        "AttachImage",
+        "Color",
+        "JSON",
+        "Password",
+        "ReadOnly",
+        "HTML"
+      ],
+      "reqd": true,
+      "in_list_view": true
+    },
+    {
+      "fieldname": "label",
+      "fieldtype": "Data",
+      "label": "Label",
+      "reqd": true,
+      "max_length": 140,
+      "in_list_view": true
+    },
+    {
+      "fieldname": "options",
+      "fieldtype": "Text",
+      "label": "Options",
+      "description": "For Select: comma-separated values. For Link: target DocType"
+    },
+    {
+      "fieldname": "reqd",
+      "fieldtype": "Check",
+      "label": "Required",
+      "default": false
+    },
+    {
+      "fieldname": "unique",
+      "fieldtype": "Check",
+      "label": "Unique",
+      "default": false
+    },
+    {
+      "fieldname": "default",
+      "fieldtype": "Text",
+      "label": "Default Value"
+    },
+    {
+      "fieldname": "max_length",
+      "fieldtype": "Int",
+      "label": "Max Length"
+    },
+    {
+      "fieldname": "precision",
+      "fieldtype": "Int",
+      "label": "Precision",
+      "description": "Decimal precision for numeric fields"
+    },
+    {
+      "fieldname": "hidden",
+      "fieldtype": "Check",
+      "label": "Hidden",
+      "default": false
+    },
+    {
+      "fieldname": "read_only",
+      "fieldtype": "Check",
+      "label": "Read Only",
+      "default": false
+    },
+    {
+      "fieldname": "in_list_view",
+      "fieldtype": "Check",
+      "label": "In List View",
+      "default": false
+    },
+    {
+      "fieldname": "in_standard_filter",
+      "fieldtype": "Check",
+      "label": "In Standard Filter",
+      "default": false
+    },
+    {
+      "fieldname": "search_index",
+      "fieldtype": "Check",
+      "label": "Search Index",
+      "default": false
+    },
+    {
+      "fieldname": "description",
+      "fieldtype": "Text",
+      "label": "Description"
+    },
+    {
+      "fieldname": "depends_on",
+      "fieldtype": "Data",
+      "label": "Depends On",
+      "max_length": 255,
+      "description": "Conditional visibility expression"
+    }
+  ],
+  "permissions": []
+}
