@@ -37,6 +37,8 @@
   ],
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@types/argon2": "^0.15.4",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.2.2",
     "@types/pg": "^8.16.0",
     "eslint": "^9.39.2",
@@ -48,7 +50,9 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
+    "argon2": "^0.44.0",
     "fastify": "^5.7.4",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.18.0",
     "pino": "^10.3.0"
   }

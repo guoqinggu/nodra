@@ -14,6 +14,7 @@ import { createLogger, type Logger } from './utils/logger.js';
 import type { Document } from './core/document/document.js';
 import { errorHandlerPlugin } from './api/error-handler.js';
 import { resourceRoutes } from './api/resource.js';
+import { authRoutes } from './api/auth.js';
 
 /**
  * Main Nodra application class.
@@ -56,6 +57,12 @@ export class Nodra {
     this.server = Fastify({ logger: false });
     errorHandlerPlugin(this.server);
     resourceRoutes(this.server, this.orm, this.registry);
+    
+    // Register auth routes
+    authRoutes(this.server, this.orm, this.registry, {
+      secret: this.config.auth.secret,
+      expiresIn: this.config.auth.tokenExpiry,
+    });
 
     // Start listening
     const { host, port } = this.config.server;

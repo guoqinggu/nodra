@@ -9,6 +9,7 @@
 
 import { Document } from '../../../src/core/document/document.js';
 import { ValidationError } from '../../../src/core/errors.js';
+import { hashPassword, validatePasswordStrength } from '../../../src/auth/password.js';
 
 export class User extends Document {
   email!: string;
@@ -24,25 +25,38 @@ export class User extends Document {
    */
   async beforeValidate(): Promise<void> {
     // Generate full name
-    if (this.first_name) {
-      this.full_name = this.last_name
-        ? `${this.first_name} ${this.last_name}`
-        : this.first_name;
+    const firstName = (this.get('first_name') ?? this.first_name) as string;
+    const lastName = (this.get('last_name') ?? this.last_name) as string | undefined;
+    
+    if (firstName) {
+      const fullName = lastName ? `${firstName} ${lastName}` : firstName;
+      this.set('full_name', fullName);
     }
   }
 
   /**
-   * Validate: ensure email is valid format
+   * Validate: ensure email is valid format and password meets requirements
    */
   async validate(): Promise<void> {
+    const email = (this.get('email') ?? this.email) as string;
+    const password = (this.get('password') ?? this.password) as string | undefined;
+
     // Basic email validation
-    if (this.email && !this.isValidEmail(this.email)) {
+    if (email && !this.isValidEmail(email)) {
       throw new ValidationError('Invalid email format');
     }
 
     // Ensure password is set for new users
-    if (this.isNew() && !this.password) {
+    if (this.isNew() && !password) {
       throw new ValidationError('Password is required for new users');
+    }
+
+    // Validate password strength if password is being set/changed
+    if (this.hasChanged('password') && password) {
+      const validation = validatePasswordStrength(password);
+      if (!validation.valid) {
+        throw new ValidationError(validation.message ?? 'Invalid password');
+      }
     }
   }
 
@@ -50,11 +64,11 @@ export class User extends Document {
    * Before save: hash password if changed
    */
   async beforeSave(): Promise<void> {
-    // TODO: Hash password using argon2 when auth module is implemented
-    // For now, we'll leave password handling for Phase 6
-    if (this.hasChanged('password') && this.password) {
-      // Placeholder: will be implemented in auth module
-      // this.password = await hashPassword(this.password);
+    const password = (this.get('password') ?? this.password) as string | undefined;
+    
+    if (this.hasChanged('password') && password) {
+      const hashedPassword = await hashPassword(password);
+      this.set('password', hashedPassword);
     }
   }
 

@@ -49,34 +49,34 @@ describe('Core DocTypes - User', () => {
   it('should generate full_name from first_name and last_name', async () => {
     const userDocType = registry.get('User');
     const user = new User(userDocType);
-    user.email = 'test@example.com';
-    user.first_name = 'John';
-    user.last_name = 'Doe';
-    user.password = 'password123';
+    user.set('email', 'test@example.com');
+    user.set('first_name', 'John');
+    user.set('last_name', 'Doe');
+    user.set('password', 'password123');
 
     await user.beforeValidate();
 
-    expect(user.full_name).toBe('John Doe');
+    expect(user.get('full_name')).toBe('John Doe');
   });
 
   it('should generate full_name from first_name only', async () => {
     const userDocType = registry.get('User');
     const user = new User(userDocType);
-    user.email = 'test@example.com';
-    user.first_name = 'John';
-    user.password = 'password123';
+    user.set('email', 'test@example.com');
+    user.set('first_name', 'John');
+    user.set('password', 'password123');
 
     await user.beforeValidate();
 
-    expect(user.full_name).toBe('John');
+    expect(user.get('full_name')).toBe('John');
   });
 
   it('should validate email format', async () => {
     const userDocType = registry.get('User');
     const user = new User(userDocType);
-    user.email = 'invalid-email';
-    user.first_name = 'John';
-    user.password = 'password123';
+    user.set('email', 'invalid-email');
+    user.set('first_name', 'John');
+    user.set('password', 'password123');
 
     await expect(user.validate()).rejects.toThrow(ValidationError);
     await expect(user.validate()).rejects.toThrow('Invalid email format');
@@ -85,8 +85,8 @@ describe('Core DocTypes - User', () => {
   it('should require password for new users', async () => {
     const userDocType = registry.get('User');
     const user = new User(userDocType);
-    user.email = 'test@example.com';
-    user.first_name = 'John';
+    user.set('email', 'test@example.com');
+    user.set('first_name', 'John');
     // No password set
 
     await expect(user.validate()).rejects.toThrow(ValidationError);
@@ -96,9 +96,9 @@ describe('Core DocTypes - User', () => {
   it('should accept valid email format', async () => {
     const userDocType = registry.get('User');
     const user = new User(userDocType);
-    user.email = 'test@example.com';
-    user.first_name = 'John';
-    user.password = 'password123';
+    user.set('email', 'test@example.com');
+    user.set('first_name', 'John');
+    user.set('password', 'password123');
 
     await expect(user.validate()).resolves.not.toThrow();
   });
