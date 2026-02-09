@@ -1,0 +1,24 @@
+{
+  "name": "Note",
+  "module": "Core",
+  "naming_rule": "autoincrement",
+  "is_submittable": false,
+  "is_child": false,
+  "fields": [
+    {
+      "fieldname": "title",
+      "fieldtype": "Data",
+      "label": "Title",
+      "reqd": true
+    },
+    {
+      "fieldname": "items",
+      "fieldtype": "Table",
+      "label": "Items",
+      "options": "Note Item"
+    }
+  ],
+  "permissions": [
+    { "role": "System Manager", "read": true, "write": true, "create": true, "delete": true }
+  ]
+}

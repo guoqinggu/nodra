@@ -1,0 +1,10 @@
+{
+  "module": "Core",
+  "fields": [
+    {
+      "fieldname": "title",
+      "fieldtype": "Data",
+      "label": "Title"
+    }
+  ]
+}

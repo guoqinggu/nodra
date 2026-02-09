@@ -1,0 +1,20 @@
+{
+  "name": "Note Item",
+  "module": "Core",
+  "naming_rule": "autoincrement",
+  "is_submittable": false,
+  "is_child": true,
+  "fields": [
+    {
+      "fieldname": "content",
+      "fieldtype": "Text",
+      "label": "Content"
+    },
+    {
+      "fieldname": "idx",
+      "fieldtype": "Int",
+      "label": "Index"
+    }
+  ],
+  "permissions": []
+}
