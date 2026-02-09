@@ -71,7 +71,7 @@ describe('errorHandlerPlugin', () => {
   });
 
   it('should return 403 for PermissionError', async () => {
-    const err = new PermissionError('Not allowed', { doctype: 'Todo', action: 'write' });
+    const err = new PermissionError('Todo', 'write', 'Not allowed');
     const app = buildApp(err);
 
     const res = await app.inject({ method: 'GET', url: '/test' });

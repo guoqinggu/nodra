@@ -110,9 +110,10 @@ describe('Error Hierarchy', () => {
     });
 
     it('should carry doctype and action context', () => {
-      const err = new PermissionError('Access denied', { doctype: 'Todo', action: 'read' });
+      const err = new PermissionError('Todo', 'read', 'Access denied');
       expect(err.doctype).toBe('Todo');
       expect(err.action).toBe('read');
+      expect(err.message).toBe('Access denied');
     });
   });
 
