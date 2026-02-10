@@ -8,7 +8,6 @@ import type { DocTypeRegistry } from '../core/doctype/registry.js';
 import { verifyPassword } from '../auth/password.js';
 import { generateToken, verifyToken, extractTokenFromHeader, type SessionConfig } from '../auth/session.js';
 import { AuthenticationError, NotFoundError } from '../core/errors.js';
-import type { Document } from '../core/document/document.js';
 
 /**
  * Login request body

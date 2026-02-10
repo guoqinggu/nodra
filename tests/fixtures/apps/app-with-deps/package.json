@@ -1,0 +1,8 @@
+{
+	"name": "app-with-deps",
+	"version": "1.0.0",
+	"description": "App with dependencies",
+	"nodra": {
+		"depends_on": ["test-app", "minimal-app"]
+	}
+}

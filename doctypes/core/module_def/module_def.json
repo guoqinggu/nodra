@@ -1,0 +1,54 @@
+{
+  "name": "Module Def",
+  "module": "Core",
+  "naming_rule": "field",
+  "naming_field": "name",
+  "is_submittable": false,
+  "is_child": false,
+  "is_single": false,
+  "is_tree": false,
+  "is_virtual": false,
+  "title_field": "name",
+  "search_fields": ["name"],
+  "fields": [
+    {
+      "fieldname": "name",
+      "fieldtype": "Data",
+      "label": "Module Name",
+      "reqd": true,
+      "unique": true,
+      "max_length": 140,
+      "in_list_view": true,
+      "description": "Module name (e.g., 'Core', 'CRM', 'Accounting')"
+    },
+    {
+      "fieldname": "app",
+      "fieldtype": "Data",
+      "label": "App",
+      "reqd": true,
+      "max_length": 140,
+      "in_list_view": true,
+      "description": "App this module belongs to"
+    },
+    {
+      "fieldname": "package",
+      "fieldtype": "Data",
+      "label": "Package",
+      "max_length": 140,
+      "description": "Package/namespace for this module"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": true,
+      "write": true,
+      "create": true,
+      "delete": true
+    },
+    {
+      "role": "All",
+      "read": true
+    }
+  ]
+}

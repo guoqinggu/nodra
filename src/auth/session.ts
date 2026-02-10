@@ -33,9 +33,11 @@ export interface SessionConfig {
  * @returns Signed JWT token
  */
 export function generateToken(payload: SessionPayload, config: SessionConfig): string {
-  return jwt.sign(payload, config.secret, {
-    expiresIn: config.expiresIn,
-  });
+  return jwt.sign(
+    { email: payload.email, fullName: payload.fullName, userType: payload.userType },
+    config.secret,
+    { expiresIn: config.expiresIn }
+  );
 }
 
 /**
@@ -89,7 +91,7 @@ export function extractTokenFromHeader(authHeader?: string): string | null {
 
   // Expected format: "Bearer <token>"
   const parts = authHeader.split(' ');
-  if (parts.length === 2 && parts[0] === 'Bearer') {
+  if (parts.length === 2 && parts[0] === 'Bearer' && parts[1]) {
     return parts[1];
   }
 

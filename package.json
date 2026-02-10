@@ -44,6 +44,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.2.2",
     "@types/pg": "^8.16.0",
+    "@types/ws": "^8.18.1",
     "eslint": "^9.39.2",
     "prettier": "^3.8.1",
     "tsup": "^8.5.1",
@@ -53,12 +54,15 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
+    "@fastify/multipart": "^9.4.0",
+    "@fastify/websocket": "^11.2.0",
     "argon2": "^0.44.0",
     "chalk": "^5.6.2",
     "commander": "^14.0.3",
     "fastify": "^5.7.4",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.18.0",
-    "pino": "^10.3.0"
+    "pino": "^10.3.0",
+    "ws": "^8.19.0"
   }
 }

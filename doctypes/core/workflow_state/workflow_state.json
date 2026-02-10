@@ -1,0 +1,59 @@
+{
+  "name": "Workflow State",
+  "module": "Core",
+  "naming_rule": "autoincrement",
+  "is_submittable": false,
+  "is_child": true,
+  "is_single": false,
+  "is_tree": false,
+  "is_virtual": false,
+  "fields": [
+    {
+      "fieldname": "state",
+      "fieldtype": "Data",
+      "label": "State Name",
+      "reqd": true,
+      "max_length": 140,
+      "in_list_view": true
+    },
+    {
+      "fieldname": "doc_status",
+      "fieldtype": "Select",
+      "label": "Document Status",
+      "options": ["Draft", "Submitted", "Cancelled"],
+      "default": "Draft",
+      "reqd": true,
+      "in_list_view": true,
+      "description": "Document status for this workflow state"
+    },
+    {
+      "fieldname": "style",
+      "fieldtype": "Select",
+      "label": "Style",
+      "options": ["Primary", "Success", "Info", "Warning", "Danger"],
+      "default": "Primary",
+      "description": "Visual style/color for this state"
+    },
+    {
+      "fieldname": "is_optional_state",
+      "fieldtype": "Check",
+      "label": "Is Optional State",
+      "default": false,
+      "description": "Whether this state can be skipped"
+    },
+    {
+      "fieldname": "allow_edit",
+      "fieldtype": "Data",
+      "label": "Allow Edit",
+      "max_length": 140,
+      "description": "Role that can edit documents in this state"
+    },
+    {
+      "fieldname": "message",
+      "fieldtype": "Text",
+      "label": "Message",
+      "description": "Message to display when document is in this state"
+    }
+  ],
+  "permissions": []
+}

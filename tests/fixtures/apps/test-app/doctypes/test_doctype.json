@@ -1,0 +1,15 @@
+{
+	"name": "TestDocType",
+	"module": "Test",
+	"doctype": "DocType",
+	"is_custom": false,
+	"fields": [
+		{
+			"fieldname": "title",
+			"label": "Title",
+			"fieldtype": "Data",
+			"reqd": true
+		}
+	],
+	"permissions": []
+}

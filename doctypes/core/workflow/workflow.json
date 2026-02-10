@@ -1,0 +1,83 @@
+{
+  "name": "Workflow",
+  "module": "Core",
+  "naming_rule": "field",
+  "naming_field": "name",
+  "is_submittable": false,
+  "is_child": false,
+  "is_single": false,
+  "is_tree": false,
+  "is_virtual": false,
+  "title_field": "name",
+  "search_fields": ["name", "document_type"],
+  "fields": [
+    {
+      "fieldname": "name",
+      "fieldtype": "Data",
+      "label": "Workflow Name",
+      "reqd": true,
+      "unique": true,
+      "max_length": 140,
+      "in_list_view": true
+    },
+    {
+      "fieldname": "document_type",
+      "fieldtype": "Data",
+      "label": "Document Type",
+      "reqd": true,
+      "max_length": 140,
+      "in_list_view": true,
+      "description": "DocType this workflow applies to"
+    },
+    {
+      "fieldname": "workflow_state_field",
+      "fieldtype": "Data",
+      "label": "Workflow State Field",
+      "reqd": true,
+      "max_length": 140,
+      "default": "workflow_state",
+      "description": "Field in the DocType to store current workflow state"
+    },
+    {
+      "fieldname": "is_active",
+      "fieldtype": "Check",
+      "label": "Is Active",
+      "default": true,
+      "in_list_view": true
+    },
+    {
+      "fieldname": "send_email_alert",
+      "fieldtype": "Check",
+      "label": "Send Email Alert",
+      "default": false,
+      "description": "Send email notifications on state transitions"
+    },
+    {
+      "fieldname": "states",
+      "fieldtype": "Table",
+      "label": "States",
+      "options": "Workflow State",
+      "description": "Workflow states"
+    },
+    {
+      "fieldname": "transitions",
+      "fieldtype": "Table",
+      "label": "Transitions",
+      "options": "Workflow Transition",
+      "description": "Workflow transitions between states"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": true,
+      "write": true,
+      "create": true,
+      "delete": true
+    },
+    {
+      "role": "All",
+      "read": true
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "name": "User Permission",
+  "module": "Core",
+  "naming_rule": "autoincrement",
+  "is_submittable": false,
+  "is_child": false,
+  "is_single": false,
+  "is_tree": false,
+  "is_virtual": false,
+  "title_field": "user",
+  "search_fields": ["user", "allow", "for_value"],
+  "fields": [
+    {
+      "fieldname": "user",
+      "fieldtype": "Link",
+      "label": "User",
+      "options": "User",
+      "reqd": true,
+      "in_list_view": true,
+      "description": "User to restrict"
+    },
+    {
+      "fieldname": "allow",
+      "fieldtype": "Data",
+      "label": "Allow DocType",
+      "reqd": true,
+      "max_length": 140,
+      "in_list_view": true,
+      "description": "DocType to apply restriction on (e.g., 'Customer', 'Project')"
+    },
+    {
+      "fieldname": "for_value",
+      "fieldtype": "Data",
+      "label": "For Value",
+      "reqd": true,
+      "max_length": 255,
+      "in_list_view": true,
+      "description": "Allowed value/document name (e.g., specific Customer ID)"
+    },
+    {
+      "fieldname": "apply_to_all_doctypes",
+      "fieldtype": "Check",
+      "label": "Apply to All DocTypes",
+      "default": false,
+      "description": "Apply this restriction to all DocTypes that link to the specified DocType"
+    },
+    {
+      "fieldname": "applicable_for",
+      "fieldtype": "Data",
+      "label": "Applicable For",
+      "max_length": 140,
+      "description": "Specific DocType to apply this restriction to (if not applying to all)"
+    },
+    {
+      "fieldname": "is_default",
+      "fieldtype": "Check",
+      "label": "Is Default",
+      "default": false,
+      "description": "Set as default value in forms"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": true,
+      "write": true,
+      "create": true,
+      "delete": true
+    }
+  ]
+}

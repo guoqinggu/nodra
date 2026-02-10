@@ -1,0 +1,62 @@
+{
+  "name": "Workflow Transition",
+  "module": "Core",
+  "naming_rule": "autoincrement",
+  "is_submittable": false,
+  "is_child": true,
+  "is_single": false,
+  "is_tree": false,
+  "is_virtual": false,
+  "fields": [
+    {
+      "fieldname": "state",
+      "fieldtype": "Data",
+      "label": "From State",
+      "reqd": true,
+      "max_length": 140,
+      "in_list_view": true,
+      "description": "Source state"
+    },
+    {
+      "fieldname": "action",
+      "fieldtype": "Data",
+      "label": "Action",
+      "reqd": true,
+      "max_length": 140,
+      "in_list_view": true,
+      "description": "Action name (e.g., 'Approve', 'Reject', 'Submit')"
+    },
+    {
+      "fieldname": "next_state",
+      "fieldtype": "Data",
+      "label": "To State",
+      "reqd": true,
+      "max_length": 140,
+      "in_list_view": true,
+      "description": "Target state after transition"
+    },
+    {
+      "fieldname": "allowed",
+      "fieldtype": "Data",
+      "label": "Allowed Role",
+      "reqd": true,
+      "max_length": 140,
+      "in_list_view": true,
+      "description": "Role allowed to perform this transition"
+    },
+    {
+      "fieldname": "condition",
+      "fieldtype": "Text",
+      "label": "Condition",
+      "description": "JavaScript expression that must be true for transition (e.g., 'doc.total > 1000')"
+    },
+    {
+      "fieldname": "allow_self_approval",
+      "fieldtype": "Check",
+      "label": "Allow Self Approval",
+      "default": false,
+      "description": "Allow document owner to perform this transition"
+    }
+  ],
+  "permissions": []
+}

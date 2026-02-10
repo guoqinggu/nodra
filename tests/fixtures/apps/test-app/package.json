@@ -1,0 +1,10 @@
+{
+	"name": "test-app",
+	"version": "1.0.0",
+	"description": "Test application for unit tests",
+	"nodra": {
+		"title": "Test App",
+		"module": "Test",
+		"publisher": "Test Publisher"
+	}
+}

@@ -99,10 +99,10 @@ function isMissing(value: unknown, field: FieldDefinition): boolean {
  */
 function validateType(
   value: unknown,
-  field: FieldDefinition,
+  _field: FieldDefinition,
   doctype: string,
 ): ErrorDetail | null {
-  const { fieldname, fieldtype } = field;
+  const { fieldname, fieldtype } = _field;
 
   switch (fieldtype) {
     case 'Int': {

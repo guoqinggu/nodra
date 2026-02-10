@@ -12,6 +12,24 @@ import { hasPermission, type PermissionAction, type UserContext } from '../permi
 import { AuthenticationError, PermissionError, NotFoundError } from '../core/errors.js';
 
 /**
+ * Extended request type with user info
+ */
+interface RequestWithUser extends FastifyRequest {
+  user?: {
+    email: string;
+    fullName?: string;
+    userType: string;
+  };
+}
+
+/**
+ * Request params with name
+ */
+interface RequestParamsWithName {
+  name: string;
+}
+
+/**
  * User roles cache (in production this would come from database)
  * For now, we'll fetch from User document
  */
@@ -41,7 +59,7 @@ async function getUserRoles(orm: ORM, userEmail: string): Promise<string[]> {
  * Verifies JWT token and adds user context to request
  */
 export function createAuthMiddleware(sessionConfig: SessionConfig) {
-  return async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+  return async (request: FastifyRequest): Promise<void> => {
     const authHeader = request.headers.authorization;
     const token = extractTokenFromHeader(authHeader);
 
@@ -53,7 +71,7 @@ export function createAuthMiddleware(sessionConfig: SessionConfig) {
     const payload = verifyToken(token, sessionConfig.secret);
 
     // Attach user info to request
-    (request as any).user = {
+    (request as RequestWithUser).user = {
       email: payload.email,
       fullName: payload.fullName,
       userType: payload.userType,
@@ -75,9 +93,9 @@ export function createPermissionMiddleware(
   action: PermissionAction,
   getDoctypeName: (request: FastifyRequest) => string
 ) {
-  return async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+  return async (request: FastifyRequest): Promise<void> => {
     // Check if user is authenticated
-    const user = (request as any).user;
+    const user = (request as RequestWithUser).user;
     if (!user) {
       throw new AuthenticationError('Authentication required');
     }
@@ -104,7 +122,8 @@ export function createPermissionMiddleware(
     // For read/write/delete operations, check document owner if applicable
     let documentOwner: string | undefined;
     if (['write', 'delete'].includes(action)) {
-      const docName = (request.params as any).name;
+      const params = request.params as RequestParamsWithName;
+      const docName = params.name;
       if (docName) {
         try {
           const doc = await orm.getDoc(doctypeName, docName);
@@ -131,14 +150,14 @@ export function createPermissionMiddleware(
  * Just attaches user if token is present
  */
 export function createOptionalAuthMiddleware(sessionConfig: SessionConfig) {
-  return async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+  return async (request: FastifyRequest): Promise<void> => {
     const authHeader = request.headers.authorization;
     const token = extractTokenFromHeader(authHeader);
 
     if (token) {
       try {
         const payload = verifyToken(token, sessionConfig.secret);
-        (request as any).user = {
+        (request as RequestWithUser).user = {
           email: payload.email,
           fullName: payload.fullName,
           userType: payload.userType,

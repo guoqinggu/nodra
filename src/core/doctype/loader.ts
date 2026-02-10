@@ -6,8 +6,8 @@
  * resolving DocType file paths by convention.
  */
 
-import { readFile, readdir, stat } from 'node:fs/promises';
-import { existsSync, readdirSync, statSync } from 'node:fs';
+import { readFile, readdir } from 'node:fs/promises';
+import { readdirSync } from 'node:fs';
 import path from 'node:path';
 import { NotFoundError, ValidationError } from '../errors.js';
 import { parseDocType, injectStandardFields } from './schema.js';
