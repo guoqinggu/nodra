@@ -103,7 +103,7 @@ describe('Error Hierarchy', () => {
 
   describe('PermissionError', () => {
     it('should extend NodraError with 403 status', () => {
-      const err = new PermissionError('No read access to Todo');
+      const err = new PermissionError('Todo', 'read');
       expect(err).toBeInstanceOf(NodraError);
       expect(err.httpStatus).toBe(403);
       expect(err.name).toBe('PermissionError');

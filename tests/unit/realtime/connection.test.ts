@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { WebSocket as MockWebSocket } from 'ws';
-import type { ConnectedClient, ClientMessage, ServerMessage } from '../../../src/realtime/types';
+import type { ConnectedClient, ClientMessage, ServerMessage } from '../../../src/realtime/types.js';
 
 // Mock WebSocket
 vi.mock('ws', () => {

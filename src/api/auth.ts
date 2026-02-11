@@ -6,7 +6,12 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import type { ORM } from '../orm/crud.js';
 import type { DocTypeRegistry } from '../core/doctype/registry.js';
 import { verifyPassword } from '../auth/password.js';
-import { generateToken, verifyToken, extractTokenFromHeader, type SessionConfig } from '../auth/session.js';
+import {
+  generateToken,
+  verifyToken,
+  extractTokenFromHeader,
+  type SessionConfig,
+} from '../auth/session.js';
 import { AuthenticationError, NotFoundError } from '../core/errors.js';
 
 /**
@@ -37,7 +42,7 @@ export function authRoutes(
   server: FastifyInstance,
   orm: ORM,
   registry: DocTypeRegistry,
-  sessionConfig: SessionConfig
+  sessionConfig: SessionConfig,
 ): void {
   /**
    * POST /api/method/login
@@ -86,7 +91,7 @@ export function authRoutes(
             fullName: user.get('full_name') as string,
             userType: user.get('user_type') as string,
           },
-          sessionConfig
+          sessionConfig,
         );
 
         const response: LoginResponse = {
@@ -107,25 +112,22 @@ export function authRoutes(
         }
         throw error;
       }
-    }
+    },
   );
 
   /**
    * POST /api/method/logout
    * Logout current user (client-side token removal)
    */
-  server.post(
-    '/api/method/logout',
-    async (request: FastifyRequest, reply: FastifyReply) => {
-      // JWT is stateless, so logout is handled client-side by removing the token
-      // This endpoint exists for consistency and future session management
-      return reply.code(200).send({
-        data: {
-          message: 'Logout successful',
-        },
-      });
-    }
-  );
+  server.post('/api/method/logout', async (request: FastifyRequest, reply: FastifyReply) => {
+    // JWT is stateless, so logout is handled client-side by removing the token
+    // This endpoint exists for consistency and future session management
+    return reply.code(200).send({
+      data: {
+        message: 'Logout successful',
+      },
+    });
+  });
 
   /**
    * GET /api/method/get_logged_user
@@ -143,7 +145,7 @@ export function authRoutes(
       }
 
       // Verify token
-      const payload = verifyToken(token, sessionConfig.secret);
+      const payload = verifyToken(token, sessionConfig.secret as string);
 
       try {
         // Fetch fresh user data
@@ -171,6 +173,6 @@ export function authRoutes(
         }
         throw error;
       }
-    }
+    },
   );
 }

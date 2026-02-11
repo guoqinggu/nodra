@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import type { FileUpload, FileValidationConfig } from '../../../src/files/types';
+import type { FileUpload, FileValidationConfig } from '../../../src/files/types.js';
 
 /**
  * File validator for testing
@@ -16,32 +16,24 @@ class FileValidator {
 
     // Validate file size
     if (this.config.maxSize && file.size > this.config.maxSize) {
-      errors.push(
-        `File size ${file.size} bytes exceeds maximum ${this.config.maxSize} bytes`
-      );
+      errors.push(`File size ${file.size} bytes exceeds maximum ${this.config.maxSize} bytes`);
     }
 
     // Validate MIME type
-    if (
-      this.config.allowedMimeTypes &&
-      this.config.allowedMimeTypes.length > 0
-    ) {
+    if (this.config.allowedMimeTypes && this.config.allowedMimeTypes.length > 0) {
       if (!this.config.allowedMimeTypes.includes(file.mimetype)) {
         errors.push(
-          `MIME type ${file.mimetype} is not allowed. Allowed types: ${this.config.allowedMimeTypes.join(', ')}`
+          `MIME type ${file.mimetype} is not allowed. Allowed types: ${this.config.allowedMimeTypes.join(', ')}`,
         );
       }
     }
 
     // Validate file extension
-    if (
-      this.config.allowedExtensions &&
-      this.config.allowedExtensions.length > 0
-    ) {
+    if (this.config.allowedExtensions && this.config.allowedExtensions.length > 0) {
       const ext = this.getExtension(file.filename);
       if (!this.config.allowedExtensions.includes(ext)) {
         errors.push(
-          `File extension ${ext} is not allowed. Allowed extensions: ${this.config.allowedExtensions.join(', ')}`
+          `File extension ${ext} is not allowed. Allowed extensions: ${this.config.allowedExtensions.join(', ')}`,
         );
       }
     }

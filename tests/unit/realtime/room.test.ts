@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import type { Room } from '../../../src/realtime/types';
+import type { Room } from '../../../src/realtime/types.js';
 
 /**
  * Helper to create room key from Room object

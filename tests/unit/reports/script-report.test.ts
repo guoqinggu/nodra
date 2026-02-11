@@ -9,7 +9,7 @@ import type {
   ScriptReportFunction,
   ReportContext,
   ReportRow,
-} from '../../../src/reports/types';
+} from '../../../src/reports/types.js';
 
 // Mock Pool
 const mockPool = {
@@ -65,7 +65,7 @@ describe('Script Report', () => {
     it('should use filters in script function', async () => {
       const scriptFn: ScriptReportFunction = async (filters) => {
         const status = filters.status as string;
-        
+
         // Simulate filtering based on status
         const allData = [
           { name: 'TODO-001', status: 'Open' },
@@ -100,7 +100,7 @@ describe('Script Report', () => {
 
       const scriptFn: ScriptReportFunction = async (filters, pool) => {
         const result = await pool.query(
-          'SELECT customer, SUM(amount) as total FROM tab_invoice GROUP BY customer'
+          'SELECT customer, SUM(amount) as total FROM tab_invoice GROUP BY customer',
         );
         return result.rows as ReportRow[];
       };
@@ -157,7 +157,7 @@ describe('Script Report', () => {
             acc[key].count += 1;
             return acc;
           },
-          {} as Record<string, { category: string; total: number; count: number }>
+          {} as Record<string, { category: string; total: number; count: number }>,
         );
 
         return Object.values(grouped);

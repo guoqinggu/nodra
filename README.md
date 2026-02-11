@@ -85,6 +85,28 @@ pnpm typecheck
 pnpm lint
 ```
 
+## 文档
+
+### 📚 完整文档
+
+| 文档           | 描述                       | 链接                                            |
+| -------------- | -------------------------- | ----------------------------------------------- |
+| **架构文档**   | 详细的系统架构和设计说明   | [ARCHITECTURE.md](./docs/ARCHITECTURE.md)       |
+| **API 参考**   | 完整的 REST API 文档和示例 | [API_REFERENCE.md](./docs/API_REFERENCE.md)     |
+| **部署指南**   | 生产环境部署最佳实践       | [DEPLOYMENT.md](./docs/DEPLOYMENT.md)           |
+| **故障排除**   | 常见问题诊断和解决方案     | [TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md) |
+| **性能优化**   | 大规模应用性能调优指南     | [PERFORMANCE.md](./docs/PERFORMANCE.md)         |
+| **开发路线图** | 详细的开发计划和进度       | [docs/ROADMAP.md](./docs/ROADMAP.md)            |
+
+### 📖 文档特色
+
+- **🏗️ 架构完整**: 862行详细架构说明，包含模块依赖图和设计原理
+- **🔌 API 详实**: 每个端点都有完整示例，涵盖认证、错误处理和最佳实践
+- **🚀 部署就绪**: 从开发到生产的完整部署流程，包含安全配置和监控
+- **🔧 故障排除**: 系统性的问题诊断方法，覆盖开发、部署和运维场景
+- **⚡ 性能优化**: 数据库、缓存、应用层的全面优化策略
+- **📈 监控体系**: 完整的性能指标收集和分析框架
+
 ## Contributing
 
 We welcome contributions! Please see our contributing guidelines for more information.

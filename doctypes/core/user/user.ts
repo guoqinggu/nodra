@@ -23,11 +23,11 @@ export class User extends Document {
   /**
    * Before validate: generate full name from first and last name
    */
-  async beforeValidate(): Promise<void> {
+  override async beforeValidate(): Promise<void> {
     // Generate full name
     const firstName = (this.get('first_name') ?? this.first_name) as string;
     const lastName = (this.get('last_name') ?? this.last_name) as string | undefined;
-    
+
     if (firstName) {
       const fullName = lastName ? `${firstName} ${lastName}` : firstName;
       this.set('full_name', fullName);
@@ -37,7 +37,7 @@ export class User extends Document {
   /**
    * Validate: ensure email is valid format and password meets requirements
    */
-  async validate(): Promise<void> {
+  override async validate(): Promise<void> {
     const email = (this.get('email') ?? this.email) as string;
     const password = (this.get('password') ?? this.password) as string | undefined;
 
@@ -63,9 +63,9 @@ export class User extends Document {
   /**
    * Before save: hash password if changed
    */
-  async beforeSave(): Promise<void> {
+  override async beforeSave(): Promise<void> {
     const password = (this.get('password') ?? this.password) as string | undefined;
-    
+
     if (this.hasChanged('password') && password) {
       const hashedPassword = await hashPassword(password);
       this.set('password', hashedPassword);

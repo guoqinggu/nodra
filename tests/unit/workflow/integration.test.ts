@@ -2,10 +2,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Document } from '../../../src/core/document/document.js';
 import { WorkflowManager } from '../../../src/workflow/workflow.js';
 import { WorkflowExecutor } from '../../../src/workflow/executor.js';
-import type {
-  WorkflowDefinition,
-  DocTypeDefinition,
-} from '../../../src/workflow/types.js';
+import type { WorkflowDefinition } from '../../../src/workflow/types.js';
+import type { DocTypeDefinition } from '../../../src/core/doctype/schema.js';
 
 describe('Workflow-Document Integration', () => {
   let workflowManager: WorkflowManager;
@@ -16,22 +14,34 @@ describe('Workflow-Document Integration', () => {
     name: 'Task',
     module: 'Projects',
     naming_rule: 'autoincrement',
+    is_submittable: false,
+    is_child: false,
+    is_single: false,
+    is_tree: false,
+    is_virtual: false,
     fields: [
       {
         fieldname: 'title',
         fieldtype: 'Data',
         label: 'Title',
-        required: true,
       },
       {
         fieldname: 'description',
         fieldtype: 'Text',
         label: 'Description',
       },
+    ],
+    permissions: [
       {
-        fieldname: 'workflow_state',
-        fieldtype: 'Data',
-        label: 'Workflow State',
+        role: 'System Manager',
+        read: true,
+        write: true,
+        create: true,
+        delete: true,
+        submit: false,
+        cancel: false,
+        amend: false,
+        if_owner: false,
       },
     ],
   };
@@ -123,13 +133,9 @@ describe('Workflow-Document Integration', () => {
       const docData = doc.getData();
 
       // Transition from Open to In Progress
-      await workflowExecutor.applyTransition(
-        'Task',
-        docData,
-        'Start Work',
-        'dev@example.com',
-        ['Developer'],
-      );
+      await workflowExecutor.applyTransition('Task', docData, 'Start Work', 'dev@example.com', [
+        'Developer',
+      ]);
 
       // Update document with new data
       doc.set('workflow_state', docData['workflow_state']);
@@ -139,13 +145,9 @@ describe('Workflow-Document Integration', () => {
       expect(doc.get('docstatus')).toBe(0);
 
       // Transition from In Progress to Completed
-      await workflowExecutor.applyTransition(
-        'Task',
-        docData,
-        'Mark Complete',
-        'dev@example.com',
-        ['Developer'],
-      );
+      await workflowExecutor.applyTransition('Task', docData, 'Mark Complete', 'dev@example.com', [
+        'Developer',
+      ]);
 
       doc.set('workflow_state', docData['workflow_state']);
       doc.set('docstatus', docData['docstatus']);
@@ -189,13 +191,9 @@ describe('Workflow-Document Integration', () => {
 
       // Try to transition directly to Completed (not allowed from Open)
       await expect(
-        workflowExecutor.applyTransition(
-          'Task',
-          docData,
-          'Mark Complete',
-          'dev@example.com',
-          ['Developer'],
-        ),
+        workflowExecutor.applyTransition('Task', docData, 'Mark Complete', 'dev@example.com', [
+          'Developer',
+        ]),
       ).rejects.toThrow('No transition');
 
       // Workflow state should remain unchanged
@@ -210,11 +208,11 @@ describe('Workflow-Document Integration', () => {
         beforeSaveCalled = false;
         afterSaveCalled = false;
 
-        async beforeSave(): Promise<void> {
+        override async beforeSave(): Promise<void> {
           this.beforeSaveCalled = true;
         }
 
-        async afterSave(): Promise<void> {
+        override async afterSave(): Promise<void> {
           this.afterSaveCalled = true;
         }
       }
@@ -229,13 +227,9 @@ describe('Workflow-Document Integration', () => {
       const docData = doc.getData();
 
       await doc.beforeSave();
-      await workflowExecutor.applyTransition(
-        'Task',
-        docData,
-        'Start Work',
-        'dev@example.com',
-        ['Developer'],
-      );
+      await workflowExecutor.applyTransition('Task', docData, 'Start Work', 'dev@example.com', [
+        'Developer',
+      ]);
       doc.set('workflow_state', docData['workflow_state']);
       await doc.afterSave();
 
@@ -253,15 +247,11 @@ describe('Workflow-Document Integration', () => {
         workflow_state: 'Open',
       });
 
-      const actions = workflowExecutor.getDocumentActions(
-        'Task',
-        doc.getData(),
-        ['Developer'],
-      );
+      const actions = workflowExecutor.getDocumentActions('Task', doc.getData(), ['Developer']);
 
       expect(actions).toHaveLength(1);
-      expect(actions[0].action).toBe('Start Work');
-      expect(actions[0].to_state).toBe('In Progress');
+      expect(actions[0]?.action).toBe('Start Work');
+      expect(actions[0]?.to_state).toBe('In Progress');
     });
 
     it('should return empty actions for final state', () => {
@@ -271,11 +261,7 @@ describe('Workflow-Document Integration', () => {
         workflow_state: 'Completed',
       });
 
-      const actions = workflowExecutor.getDocumentActions(
-        'Task',
-        doc.getData(),
-        ['Developer'],
-      );
+      const actions = workflowExecutor.getDocumentActions('Task', doc.getData(), ['Developer']);
 
       expect(actions).toHaveLength(0);
     });
@@ -288,11 +274,7 @@ describe('Workflow-Document Integration', () => {
       });
 
       // User without required roles
-      const actions = workflowExecutor.getDocumentActions(
-        'Task',
-        doc.getData(),
-        ['Guest'],
-      );
+      const actions = workflowExecutor.getDocumentActions('Task', doc.getData(), ['Guest']);
 
       expect(actions).toHaveLength(0);
     });
@@ -306,9 +288,7 @@ describe('Workflow-Document Integration', () => {
         workflow_state: 'Open',
       });
 
-      expect(() =>
-        workflowExecutor.validateWorkflowState('Task', doc.getData()),
-      ).not.toThrow();
+      expect(() => workflowExecutor.validateWorkflowState('Task', doc.getData())).not.toThrow();
     });
 
     it('should throw error for invalid workflow state', () => {
@@ -318,9 +298,9 @@ describe('Workflow-Document Integration', () => {
         workflow_state: 'InvalidState',
       });
 
-      expect(() =>
-        workflowExecutor.validateWorkflowState('Task', doc.getData()),
-      ).toThrow('Invalid workflow state');
+      expect(() => workflowExecutor.validateWorkflowState('Task', doc.getData())).toThrow(
+        'Invalid workflow state',
+      );
     });
 
     it('should throw error when workflow state field is missing', () => {
@@ -329,9 +309,9 @@ describe('Workflow-Document Integration', () => {
         title: 'Test Task',
       });
 
-      expect(() =>
-        workflowExecutor.validateWorkflowState('Task', doc.getData()),
-      ).toThrow('does not have workflow state');
+      expect(() => workflowExecutor.validateWorkflowState('Task', doc.getData())).toThrow(
+        'does not have workflow state',
+      );
     });
   });
 
@@ -349,13 +329,9 @@ describe('Workflow-Document Integration', () => {
       const docData = doc.getData();
 
       // Apply transition
-      await workflowExecutor.applyTransition(
-        'Task',
-        docData,
-        'Start Work',
-        'dev@example.com',
-        ['Developer'],
-      );
+      await workflowExecutor.applyTransition('Task', docData, 'Start Work', 'dev@example.com', [
+        'Developer',
+      ]);
 
       // Update document
       doc.set('workflow_state', docData['workflow_state']);

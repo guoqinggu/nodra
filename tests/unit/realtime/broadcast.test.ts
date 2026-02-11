@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import type { Room, ServerMessage, DocEvent } from '../../../src/realtime/types';
-import { DefaultRoomManager } from '../../../src/realtime/room-manager';
+import type { Room, ServerMessage, DocEvent } from '../../../src/realtime/types.js';
+import { DefaultRoomManager } from '../../../src/realtime/room-manager.js';
 
 /**
  * Mock WebSocket server for testing broadcasts

@@ -23,7 +23,7 @@ export class File extends Document {
   /**
    * Validate: ensure file has either file_url or is a folder
    */
-  async validate(): Promise<void> {
+  override async validate(): Promise<void> {
     if (!this.is_folder && !this.file_url) {
       throw new ValidationError('File URL is required for non-folder files');
     }
@@ -37,7 +37,7 @@ export class File extends Document {
   /**
    * Before delete: check if folder is empty
    */
-  async beforeDelete(): Promise<void> {
+  override async beforeDelete(): Promise<void> {
     if (this.is_folder) {
       // TODO: Check if folder has children when ORM query is available
       // For now, this is a placeholder for Phase 12 implementation

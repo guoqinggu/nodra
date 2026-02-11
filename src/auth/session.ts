@@ -2,7 +2,7 @@
  * JWT session management
  */
 
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { AuthenticationError } from '../core/errors.js';
 
 export interface SessionPayload {
@@ -20,7 +20,7 @@ export interface SessionPayload {
 
 export interface SessionConfig {
   /** Secret key for signing tokens */
-  secret: string;
+  secret: jwt.Secret;
   /** Token expiry (e.g., '24h', '7d') */
   expiresIn: string;
 }
@@ -36,7 +36,7 @@ export function generateToken(payload: SessionPayload, config: SessionConfig): s
   return jwt.sign(
     { email: payload.email, fullName: payload.fullName, userType: payload.userType },
     config.secret,
-    { expiresIn: config.expiresIn }
+    { expiresIn: config.expiresIn } as SignOptions,
   );
 }
 

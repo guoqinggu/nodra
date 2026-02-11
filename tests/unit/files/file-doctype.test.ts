@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import type { FileMetadata } from '../../../src/files/types';
+import type { FileMetadata } from '../../../src/files/types.js';
 
 describe('File DocType', () => {
   describe('File Metadata', () => {
@@ -200,7 +200,7 @@ describe('File DocType', () => {
       expect(result1).not.toContain('/');
       expect(result1).toContain('etc');
       expect(result1).toContain('passwd');
-      
+
       expect(sanitizeFilename('test<script>.pdf')).toBe('test-script-.pdf');
       expect(sanitizeFilename('file with spaces.pdf')).toBe('file-with-spaces.pdf');
     });

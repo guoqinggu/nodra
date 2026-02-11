@@ -8,7 +8,7 @@ import type {
   ReportColumn,
   ReportFilter,
   ReportContext,
-} from '../../../src/reports/types';
+} from '../../../src/reports/types.js';
 
 describe('Query Report Definition', () => {
   describe('Report Structure', () => {

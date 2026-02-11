@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { ReportColumn } from '../../../src/reports/types';
+import type { ReportColumn } from '../../../src/reports/types.js';
 
 /**
  * Format a value based on column type
@@ -119,9 +119,7 @@ describe('Column Formatting', () => {
         fieldtype: 'Date',
       };
 
-      expect(formatColumnValue('2026-02-10T00:00:00Z', column)).toBe(
-        '2026-02-10'
-      );
+      expect(formatColumnValue('2026-02-10T00:00:00Z', column)).toBe('2026-02-10');
     });
   });
 
@@ -232,12 +230,7 @@ describe('Data Transformation', () => {
     });
 
     it('should calculate averages', () => {
-      const data = [
-        { score: 85 },
-        { score: 90 },
-        { score: 75 },
-        { score: 95 },
-      ];
+      const data = [{ score: 85 }, { score: 90 }, { score: 75 }, { score: 95 }];
 
       const average = data.reduce((sum, row) => sum + row.score, 0) / data.length;
 
@@ -263,7 +256,7 @@ describe('Data Transformation', () => {
           acc[key].push(row);
           return acc;
         },
-        {} as Record<string, typeof data>
+        {} as Record<string, typeof data>,
       );
 
       expect(grouped['A']).toHaveLength(2);
@@ -288,11 +281,7 @@ describe('Data Transformation', () => {
     });
 
     it('should sort data by string field', () => {
-      const data = [
-        { name: 'Charlie' },
-        { name: 'Alice' },
-        { name: 'Bob' },
-      ];
+      const data = [{ name: 'Charlie' }, { name: 'Alice' }, { name: 'Bob' }];
 
       const sorted = [...data].sort((a, b) => a.name.localeCompare(b.name));
 

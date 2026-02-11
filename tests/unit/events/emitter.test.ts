@@ -51,7 +51,7 @@ describe('EventEmitter', () => {
 
     emitter.on('test1', handler1);
     emitter.on('test2', handler2);
-    
+
     await emitter.emit(event1);
     await emitter.emit(event2);
 
@@ -84,7 +84,7 @@ describe('EventEmitter', () => {
 
     emitter.once('test', onceHandler);
     emitter.on('test', regularHandler);
-    
+
     await emitter.emit(event);
     await emitter.emit(event);
 
@@ -103,7 +103,7 @@ describe('EventEmitter', () => {
 
     emitter.on('test', handler1);
     emitter.on('test', handler2);
-    
+
     emitter.off('test', handler1);
     await emitter.emit(event);
 
@@ -118,7 +118,7 @@ describe('EventEmitter', () => {
 
     emitter.on('test', handler1);
     emitter.on('test', handler2);
-    
+
     emitter.removeAllListeners('test');
     await emitter.emit(event);
 
@@ -134,7 +134,7 @@ describe('EventEmitter', () => {
 
     emitter.on('test1', handler1);
     emitter.on('test2', handler2);
-    
+
     emitter.removeAllListeners();
     await emitter.emit(event1);
     await emitter.emit(event2);
@@ -149,7 +149,7 @@ describe('EventEmitter', () => {
 
   it('should handle async handlers', async () => {
     const asyncHandler = vi.fn().mockImplementation(async () => {
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
     });
     const event = { type: 'test', timestamp: new Date() };
 
@@ -161,14 +161,14 @@ describe('EventEmitter', () => {
 
   it('should execute async handlers in sequence', async () => {
     const callOrder: number[] = [];
-    
+
     const handler1 = vi.fn().mockImplementation(async () => {
-      await new Promise(resolve => setTimeout(resolve, 20));
+      await new Promise((resolve) => setTimeout(resolve, 20));
       callOrder.push(1);
     });
-    
+
     const handler2 = vi.fn().mockImplementation(async () => {
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       callOrder.push(2);
     });
 
@@ -176,7 +176,7 @@ describe('EventEmitter', () => {
 
     emitter.on('test', handler1);
     emitter.on('test', handler2);
-    
+
     await emitter.emit(event);
 
     expect(callOrder).toEqual([1, 2]); // First handler completes before second
@@ -186,15 +186,15 @@ describe('EventEmitter', () => {
     const failingHandler = vi.fn().mockImplementation(() => {
       throw new Error('Handler failed');
     });
-    
+
     const successfulHandler = vi.fn();
     const event = { type: 'test', timestamp: new Date() };
 
     emitter.on('test', failingHandler);
     emitter.on('test', successfulHandler);
-    
+
     await expect(emitter.emit(event)).resolves.toBeUndefined();
-    
+
     expect(failingHandler).toHaveBeenCalledWith(event);
     expect(successfulHandler).toHaveBeenCalledWith(event);
   });
@@ -205,7 +205,7 @@ describe('EventEmitter', () => {
 
   it('should execute handlers in priority order', async () => {
     const callOrder: string[] = [];
-    
+
     const lowHandler = vi.fn().mockImplementation(() => callOrder.push('low'));
     const normalHandler = vi.fn().mockImplementation(() => callOrder.push('normal'));
     const highHandler = vi.fn().mockImplementation(() => callOrder.push('high'));
@@ -217,7 +217,7 @@ describe('EventEmitter', () => {
     emitter.on('test', normalHandler, 'normal');
     emitter.on('test', highHandler, 'high');
     emitter.on('test', criticalHandler, 'critical');
-    
+
     await emitter.emit(event);
 
     expect(callOrder).toEqual(['critical', 'high', 'normal', 'low']);
@@ -225,7 +225,7 @@ describe('EventEmitter', () => {
 
   it('should handle same priority handlers in registration order', async () => {
     const callOrder: number[] = [];
-    
+
     const handler1 = vi.fn().mockImplementation(() => callOrder.push(1));
     const handler2 = vi.fn().mockImplementation(() => callOrder.push(2));
     const handler3 = vi.fn().mockImplementation(() => callOrder.push(3));
@@ -235,7 +235,7 @@ describe('EventEmitter', () => {
     emitter.on('test', handler1, 'normal');
     emitter.on('test', handler2, 'normal');
     emitter.on('test', handler3, 'normal');
-    
+
     await emitter.emit(event);
 
     expect(callOrder).toEqual([1, 2, 3]);
@@ -251,7 +251,7 @@ describe('EventEmitter', () => {
     const event2 = { type: 'test2', timestamp: new Date() };
 
     emitter.onAny(wildcardHandler);
-    
+
     await emitter.emit(event1);
     await emitter.emit(event2);
 
@@ -266,7 +266,7 @@ describe('EventEmitter', () => {
     const event2 = { type: 'test2', timestamp: new Date() };
 
     emitter.onceAny(wildcardHandler);
-    
+
     await emitter.emit(event1);
     await emitter.emit(event2); // Should not call handler again
 
@@ -318,25 +318,23 @@ describe('EventEmitter', () => {
     emitter.on('test', handler);
     emitter.on('test', handler); // This should trigger warning
 
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      'Max listeners (2) exceeded for event type: test'
-    );
+    expect(consoleWarnSpy).toHaveBeenCalledWith('Max listeners (2) exceeded for event type: test');
 
     consoleWarnSpy.mockRestore();
   });
 
   it('should throw when exceeding max listeners with throw option', () => {
-    const emitter = new EventEmitter({ 
-      maxListeners: 2, 
-      throwOnMaxListenersExceeded: true 
+    const emitter = new EventEmitter({
+      maxListeners: 2,
+      throwOnMaxListenersExceeded: true,
     });
     const handler = vi.fn();
 
     emitter.on('test', handler);
     emitter.on('test', handler);
-    
+
     expect(() => emitter.on('test', handler)).toThrow(
-      'Max listeners (2) exceeded for event type: test'
+      'Max listeners (2) exceeded for event type: test',
     );
   });
 
@@ -349,14 +347,14 @@ describe('EventEmitter', () => {
       data: { id: string; value: number };
     }
 
-    const typedHandler = vi.fn((event: CustomEvent) => {
-      return event.data.value * 2;
+    const typedHandler = vi.fn((event: CustomEvent): void => {
+      event.data.value * 2;
     });
 
     const customEvent: CustomEvent = {
       type: 'custom',
       timestamp: new Date(),
-      data: { id: '123', value: 42 }
+      data: { id: '123', value: 42 },
     };
 
     emitter.on<CustomEvent>('custom', typedHandler);
@@ -374,7 +372,7 @@ describe('EventEmitter', () => {
       doctype: 'User',
       name: 'USR001',
       operation: 'insert',
-      data: { name: 'John Doe', email: 'john@example.com' }
+      data: { name: 'John Doe', email: 'john@example.com' },
     };
 
     emitter.on<DocumentEvent>('document.insert', docHandler);

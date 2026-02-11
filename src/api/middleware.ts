@@ -1,14 +1,18 @@
 /**
  * Permission middleware for Fastify
- * 
+ *
  * Authenticates and authorizes requests before handling
  */
 
-import type { FastifyRequest, FastifyReply } from 'fastify';
+import type { FastifyRequest } from 'fastify';
 import type { DocTypeRegistry } from '../core/doctype/registry.js';
 import type { ORM } from '../orm/crud.js';
 import { extractTokenFromHeader, verifyToken, type SessionConfig } from '../auth/session.js';
-import { hasPermission, type PermissionAction, type UserContext } from '../permissions/permission.js';
+import {
+  hasPermission,
+  type PermissionAction,
+  type UserContext,
+} from '../permissions/permission.js';
 import { AuthenticationError, PermissionError, NotFoundError } from '../core/errors.js';
 
 /**
@@ -36,15 +40,15 @@ interface RequestParamsWithName {
 async function getUserRoles(orm: ORM, userEmail: string): Promise<string[]> {
   try {
     const user = await orm.getDoc('User', userEmail);
-    
+
     // Get roles from user document (roles is a Table field)
     const roles = user.get('roles') as Array<{ role: string }> | undefined;
-    
+
     if (!roles || roles.length === 0) {
       // Default role if no roles assigned
       return ['Guest'];
     }
-    
+
     return roles.map((r) => r.role);
   } catch (error) {
     if (error instanceof NotFoundError) {
@@ -68,7 +72,7 @@ export function createAuthMiddleware(sessionConfig: SessionConfig) {
     }
 
     // Verify and decode token
-    const payload = verifyToken(token, sessionConfig.secret);
+    const payload = verifyToken(token, sessionConfig.secret as string);
 
     // Attach user info to request
     (request as RequestWithUser).user = {
@@ -81,7 +85,7 @@ export function createAuthMiddleware(sessionConfig: SessionConfig) {
 
 /**
  * Create permission checking middleware for DocType operations
- * 
+ *
  * @param registry - DocType registry
  * @param orm - ORM instance
  * @param action - Permission action to check
@@ -91,7 +95,7 @@ export function createPermissionMiddleware(
   registry: DocTypeRegistry,
   orm: ORM,
   action: PermissionAction,
-  getDoctypeName: (request: FastifyRequest) => string
+  getDoctypeName: (request: FastifyRequest) => string,
 ) {
   return async (request: FastifyRequest): Promise<void> => {
     // Check if user is authenticated
@@ -139,7 +143,7 @@ export function createPermissionMiddleware(
       throw new PermissionError(
         doctypeName,
         action,
-        `You do not have permission to ${action} ${doctypeName}`
+        `You do not have permission to ${action} ${doctypeName}`,
       );
     }
   };
@@ -156,7 +160,7 @@ export function createOptionalAuthMiddleware(sessionConfig: SessionConfig) {
 
     if (token) {
       try {
-        const payload = verifyToken(token, sessionConfig.secret);
+        const payload = verifyToken(token, sessionConfig.secret as string);
         (request as RequestWithUser).user = {
           email: payload.email,
           fullName: payload.fullName,

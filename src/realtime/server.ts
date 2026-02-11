@@ -145,7 +145,7 @@ export class WebSocketServer implements IWebSocketServer {
       try {
         const message: ClientMessage = JSON.parse(data.toString());
         this.handleMessage(clientId, message);
-      } catch (error) {
+      } catch {
         this.sendError(clientId, 'Invalid message format');
       }
     });
@@ -200,9 +200,7 @@ export class WebSocketServer implements IWebSocketServer {
       return;
     }
 
-    const room: Room = name
-      ? { type: 'document', doctype, name }
-      : { type: 'doctype', doctype };
+    const room: Room = name ? { type: 'document', doctype, name } : { type: 'doctype', doctype };
 
     this.roomManager.subscribe(clientId, room);
 
@@ -223,9 +221,7 @@ export class WebSocketServer implements IWebSocketServer {
       return;
     }
 
-    const room: Room = name
-      ? { type: 'document', doctype, name }
-      : { type: 'doctype', doctype };
+    const room: Room = name ? { type: 'document', doctype, name } : { type: 'doctype', doctype };
 
     this.roomManager.unsubscribe(clientId, room);
 

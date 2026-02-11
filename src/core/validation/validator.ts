@@ -63,10 +63,9 @@ export function validateDocument(doc: Document, meta: DocTypeDefinition): void {
   }
 
   if (errors.length > 0) {
-    throw new ValidationError(
-      `Validation failed for ${meta.name}: ${errors.length} error(s)`,
-      { details: errors },
-    );
+    throw new ValidationError(`Validation failed for ${meta.name}: ${errors.length} error(s)`, {
+      details: errors,
+    });
   }
 }
 
@@ -78,7 +77,7 @@ export function validateDocument(doc: Document, meta: DocTypeDefinition): void {
  * Returns true if a value should be considered "missing" for a required field.
  * Special handling: 0 is valid for numeric fields, false is valid for Check.
  */
-function isMissing(value: unknown, field: FieldDefinition): boolean {
+function isMissing(value: unknown, _field: FieldDefinition): boolean {
   if (value === null || value === undefined) {
     return true;
   }

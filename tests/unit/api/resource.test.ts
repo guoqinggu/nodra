@@ -3,7 +3,7 @@ import Fastify from 'fastify';
 import { resourceRoutes } from '../../../src/api/resource.js';
 import { errorHandlerPlugin } from '../../../src/api/error-handler.js';
 import { NotFoundError } from '../../../src/core/errors.js';
-import type { ORM, ListOptions } from '../../../src/orm/crud.js';
+import type { ORM } from '../../../src/orm/crud.js';
 import type { DocTypeRegistry } from '../../../src/core/doctype/registry.js';
 import type { DocTypeDefinition } from '../../../src/core/doctype/schema.js';
 
@@ -23,7 +23,13 @@ function makeMeta(overrides: Partial<DocTypeDefinition> = {}): DocTypeDefinition
     is_virtual: false,
     fields: [
       { fieldname: 'title', fieldtype: 'Data', label: 'Title', reqd: true, max_length: 255 },
-      { fieldname: 'status', fieldtype: 'Select', label: 'Status', options: ['Open', 'Closed'], default: 'Open' },
+      {
+        fieldname: 'status',
+        fieldtype: 'Select',
+        label: 'Status',
+        options: ['Open', 'Closed'],
+        default: 'Open',
+      },
     ],
     permissions: [],
     ...overrides,
@@ -44,8 +50,12 @@ function makeMockDoc(data: Record<string, unknown>) {
     getData() {
       return { ...data, doctype: this.doctype, name: this.name, owner: this.owner };
     },
-    get(fieldname: string) { return data[fieldname]; },
-    set(fieldname: string, value: unknown) { data[fieldname] = value; },
+    get(fieldname: string) {
+      return data[fieldname];
+    },
+    set(fieldname: string, value: unknown) {
+      data[fieldname] = value;
+    },
     ...data,
   };
 }

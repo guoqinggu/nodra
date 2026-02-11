@@ -56,7 +56,7 @@ describe('Token Generation', () => {
 describe('Token Verification', () => {
   it('should verify valid token', () => {
     const token = generateToken(testPayload, testConfig);
-    const verified = verifyToken(token, testConfig.secret);
+    const verified = verifyToken(token, testConfig.secret as string);
 
     expect(verified.email).toBe(testPayload.email);
     expect(verified.fullName).toBe(testPayload.fullName);
@@ -78,16 +78,18 @@ describe('Token Verification', () => {
 
     const token = generateToken(testPayload, expiredConfig);
 
-    expect(() => verifyToken(token, testConfig.secret)).toThrow(AuthenticationError);
-    expect(() => verifyToken(token, testConfig.secret)).toThrow('Token has expired');
+    expect(() => verifyToken(token, testConfig.secret as string)).toThrow(AuthenticationError);
+    expect(() => verifyToken(token, testConfig.secret as string)).toThrow('Token has expired');
   });
 
   it('should reject malformed token', () => {
-    expect(() => verifyToken('invalid.token.here', testConfig.secret)).toThrow(AuthenticationError);
+    expect(() => verifyToken('invalid.token.here', testConfig.secret as string)).toThrow(
+      AuthenticationError,
+    );
   });
 
   it('should reject empty token', () => {
-    expect(() => verifyToken('', testConfig.secret)).toThrow(AuthenticationError);
+    expect(() => verifyToken('', testConfig.secret as string)).toThrow(AuthenticationError);
   });
 });
 

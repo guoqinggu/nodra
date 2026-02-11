@@ -16,10 +16,10 @@ export class Role extends Document {
   /**
    * Validate: ensure system roles cannot be modified
    */
-  async validate(): Promise<void> {
+  override async validate(): Promise<void> {
     // System roles that cannot be deleted or disabled
     const systemRoles = ['System Manager', 'All', 'Guest'];
-    
+
     // Get role_name from data
     const roleName = (this.get('role_name') ?? this.role_name) as string;
 
@@ -27,7 +27,7 @@ export class Role extends Document {
       // Get the disabled value
       const disabledValue = this.get('disabled') ?? this.disabled;
       const hasDisabledChanged = this.hasChanged('disabled');
-      
+
       if (hasDisabledChanged && disabledValue) {
         throw new ValidationError(`System role '${roleName}' cannot be disabled`);
       }
@@ -37,9 +37,9 @@ export class Role extends Document {
   /**
    * Before delete: prevent deletion of system roles
    */
-  async beforeDelete(): Promise<void> {
+  override async beforeDelete(): Promise<void> {
     const systemRoles = ['System Manager', 'All', 'Guest'];
-    
+
     // Get role_name from data
     const roleName = (this.get('role_name') ?? this.role_name) as string;
 
