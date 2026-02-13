@@ -76,17 +76,17 @@ Commit frequently - each logical unit of work should be a separate commit.
 
 ### Naming Conventions
 
-| Item                  | Convention        | Example                    |
-|-----------------------|-------------------|----------------------------|
-| Files                 | kebab-case        | `query-builder.ts`         |
-| Classes               | PascalCase        | `QueryBuilder`             |
-| Interfaces            | PascalCase        | `DocTypeDefinition`        |
-| Functions/Methods     | camelCase         | `getDocType()`             |
-| Constants             | UPPER_SNAKE_CASE  | `MAX_POOL_SIZE`            |
-| Database tables       | snake_case + prefix | `tab_todo`               |
-| Database columns      | snake_case        | `modified_by`              |
-| DocType names         | PascalCase/spaces | `Todo`, `Sales Invoice`    |
-| Field names           | snake_case        | `due_date`, `assigned_to`  |
+| Item              | Convention          | Example                   |
+| ----------------- | ------------------- | ------------------------- |
+| Files             | kebab-case          | `query-builder.ts`        |
+| Classes           | PascalCase          | `QueryBuilder`            |
+| Interfaces        | PascalCase          | `DocTypeDefinition`       |
+| Functions/Methods | camelCase           | `getDocType()`            |
+| Constants         | UPPER_SNAKE_CASE    | `MAX_POOL_SIZE`           |
+| Database tables   | snake_case + prefix | `tab_todo`                |
+| Database columns  | snake_case          | `modified_by`             |
+| DocType names     | PascalCase/spaces   | `Todo`, `Sales Invoice`   |
+| Field names       | snake_case          | `due_date`, `assigned_to` |
 
 ### TypeScript Rules
 
@@ -121,25 +121,108 @@ Commit frequently - each logical unit of work should be a separate commit.
 - Use argon2 for password hashing (never bcrypt, md5, sha)
 - Sanitize output to prevent XSS
 
+## Superpowers Engineering Standards
+
+This project follows [superpowers](https://github.com/opencode-ai/superpowers) engineering standards for AI-assisted development.
+
+### Required Skills for Development
+
+**Always invoke these skills when applicable:**
+
+| Skill                                        | When to Use                              |
+| -------------------------------------------- | ---------------------------------------- |
+| `superpowers:using-superpowers`              | Starting any conversation                |
+| `superpowers:brainstorming`                  | Creating features, building components   |
+| `superpowers:test-driven-development`        | Implementing features, bug fixes         |
+| `superpowers:writing-plans`                  | Multi-step tasks (2+ steps)              |
+| `superpowers:executing-plans`                | Implementing written plans               |
+| `superpowers:using-git-worktrees`            | Feature work requiring isolation         |
+| `superpowers:systematic-debugging`           | Bugs, test failures, unexpected behavior |
+| `superpowers:verification-before-completion` | Before claiming completion               |
+| `superpowers:finishing-a-development-branch` | Completing development work              |
+
+**See [CLAUDE.md](./CLAUDE.md) for detailed workflow guidelines.**
+
+### Development Workflow
+
+#### 1. Plan-Driven Development (Required for Multi-Step Tasks)
+
+For any task requiring 2+ steps:
+
+```bash
+# 1. Create worktree for isolation
+git worktree add .worktrees/feature-name -b feature/feature-name
+cd .worktrees/feature-name
+
+# 2. Write implementation plan to docs/plans/
+# Use superpowers:writing-plans skill
+
+# 3. Execute plan task-by-task
+# Use superpowers:executing-plans skill
+```
+
+#### 2. Test-Driven Development (Always Required)
+
+**Iron Law**: NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
+
+**Red-Green-Refactor Cycle:**
+
+1. **RED**: Write one minimal failing test
+2. **Verify RED**: Run test, confirm it fails correctly
+3. **GREEN**: Write minimal code to pass
+4. **Verify GREEN**: Run test, confirm all pass
+5. **REFACTOR**: Clean up, keep tests green
+
+#### 3. Verification Before Completion
+
+Before ANY completion claim, run:
+
+```bash
+pnpm lint        # Must pass
+pnpm typecheck   # Must pass
+pnpm test        # Must pass
+pnpm build       # Must succeed
+```
+
+**Evidence before claims. No shortcuts.**
+
+### Commit Standards
+
+**Conventional Commits:**
+
+```
+<type>(<scope>): <description>
+
+Types: feat, fix, test, refactor, docs, chore, perf, ci
+Scopes: core, doctype, document, database, orm, api, auth, permissions, workflow, hooks, events, jobs, realtime, files, report, cli, app, migration
+```
+
+**Pre-commit Hooks (Automatic):**
+
+- `pnpm lint` - ESLint check
+- `pnpm typecheck` - TypeScript check
+
 ## Multi-Agent Development
 
-Development uses specialized Qoder skills for different domains:
+Development uses specialized skills for different domains:
 
-### Available Skills
+### Domain-Specific Skills
 
-| Skill         | Purpose                                              |
-|--------------|------------------------------------------------------|
+| Skill        | Purpose                                              |
+| ------------ | ---------------------------------------------------- |
 | `nodra-core` | Core framework: DocType, Document, errors, config    |
 | `nodra-db`   | Database: connection, query builder, schema sync     |
-| `nodra-api`  | API layer: Fastify routes, middleware, serialization  |
+| `nodra-api`  | API layer: Fastify routes, middleware, serialization |
 | `nodra-test` | TDD: test writing, fixtures, test infrastructure     |
 
 ### Agent Workflow
 
-1. **Planning**: Use `nodra-core` skill to understand the architecture and plan work
-2. **Test First**: Use `nodra-test` skill to write tests for the feature
-3. **Implementation**: Use the appropriate domain skill to implement
-4. **Verification**: Run tests, type check, and lint before committing
+1. **Planning**: Use `nodra-core` + `superpowers:brainstorming` to plan
+2. **Plan Writing**: Use `superpowers:writing-plans` for multi-step tasks
+3. **Test First**: Use `superpowers:test-driven-development` + `nodra-test`
+4. **Implementation**: Use appropriate domain skill
+5. **Verification**: Use `superpowers:verification-before-completion`
+6. **Completion**: Use `superpowers:finishing-a-development-branch`
 
 ### Inter-Module Dependencies
 
@@ -149,6 +232,18 @@ When implementing a feature that spans multiple modules:
 2. Write interfaces/types first for the dependency boundary
 3. Implement bottom-up with tests at each layer
 4. Integration test the full stack at the end
+
+### Code Review Process
+
+Before submitting PR:
+
+- [ ] All verification commands pass
+- [ ] Follows TDD (test exists and failed first)
+- [ ] Follows conventional commit format
+- [ ] Documentation updated (if applicable)
+- [ ] No `any` types (use `unknown` + narrowing)
+- [ ] Error hierarchy used correctly
+- [ ] SQL queries use parameterized statements
 
 ## Architecture Quick Reference
 

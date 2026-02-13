@@ -1,9 +1,25 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
+*.tsbuildinfo
+
+# Environment
 .env
 .env.*
 !.env.example
+
+# Logs
 *.log
+
+# Testing
 coverage/
+
+# OS
 .DS_Store
-*.tsbuildinfo
+
+# Git worktrees (isolated development environments)
+# See CLAUDE.md for worktree usage guidelines
+.worktrees/
+worktrees/
