@@ -1,0 +1,26 @@
+{
+  "recommendations": [
+    // Core extensions
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+
+    // TypeScript
+    "ms-vscode.vscode-typescript-next",
+
+    // Testing
+    "vitest.explorer",
+
+    // Git
+    "eamodio.gitlens",
+
+    // Utilities
+    "streetsidesoftware.code-spell-checker",
+    "usernamehw.errorlens",
+    "wayou.vscode-todo-highlight",
+
+    // Editor enhancements
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense"
+  ]
+}
