@@ -5,10 +5,11 @@
  * Essential for third-party integrations and external system access.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   generateAPIKey,
   hashAPIKey,
+  hashAPISecret,
   verifyAPIKey,
   revokeAPIKey,
   getAPIKeyPermissions,
@@ -133,8 +134,8 @@ describe('API Key Hashing', () => {
     const keyPair = generateAPIKey(testConfig);
     const hash = await hashAPIKey(keyPair.key);
 
-    // Argon2 hashes start with $argon2
-    expect(hash).toMatch(/^\$argon2/);
+    // SHA-256 hashes are 64 character hex strings
+    expect(hash).toMatch(/^[a-f0-9]{64}$/);
   });
 });
 
@@ -151,7 +152,7 @@ describe('API Key Verification', () => {
 
     const record: APIKeyRecord = {
       keyHash,
-      secretHash: await hashAPIKey(keyPair.secret),
+      secretHash: await hashAPISecret(keyPair.secret),
       userEmail: 'test@example.com',
       userRoles: ['User'],
       createdAt: new Date(),
@@ -185,7 +186,7 @@ describe('API Key Verification', () => {
 
     const record: APIKeyRecord = {
       keyHash,
-      secretHash: await hashAPIKey(keyPair.secret),
+      secretHash: await hashAPISecret(keyPair.secret),
       userEmail: 'test@example.com',
       userRoles: ['User'],
       createdAt: new Date(),
@@ -210,7 +211,7 @@ describe('API Key Verification', () => {
 
     const record: APIKeyRecord = {
       keyHash,
-      secretHash: await hashAPIKey(keyPair.secret),
+      secretHash: await hashAPISecret(keyPair.secret),
       userEmail: 'test@example.com',
       userRoles: ['User'],
       createdAt: new Date(Date.now() - 86400000 * 30), // 30 days ago
@@ -235,7 +236,7 @@ describe('API Key Verification', () => {
 
     const record: APIKeyRecord = {
       keyHash,
-      secretHash: await hashAPIKey(keyPair.secret),
+      secretHash: await hashAPISecret(keyPair.secret),
       userEmail: 'test@example.com',
       userRoles: ['User'],
       createdAt: new Date(),
@@ -259,7 +260,7 @@ describe('API Key Verification', () => {
 
     const record: APIKeyRecord = {
       keyHash,
-      secretHash: await hashAPIKey(keyPair.secret),
+      secretHash: await hashAPISecret(keyPair.secret),
       userEmail: 'test@example.com',
       userRoles: ['User'],
       createdAt: new Date(),
@@ -293,7 +294,7 @@ describe('API Key Revocation', () => {
 
     const record: APIKeyRecord = {
       keyHash,
-      secretHash: await hashAPIKey(keyPair.secret),
+      secretHash: await hashAPISecret(keyPair.secret),
       userEmail: 'test@example.com',
       userRoles: ['User'],
       createdAt: new Date(),
@@ -335,7 +336,7 @@ describe('List User API Keys', () => {
       const keyPair = generateAPIKey(testConfig);
       const record: APIKeyRecord = {
         keyHash: await hashAPIKey(keyPair.key),
-        secretHash: await hashAPIKey(keyPair.secret),
+        secretHash: await hashAPISecret(keyPair.secret),
         userEmail: user1,
         userRoles: ['User'],
         createdAt: new Date(),
@@ -407,7 +408,7 @@ describe('API Key Permissions', () => {
 
     const record: APIKeyRecord = {
       keyHash,
-      secretHash: await hashAPIKey(keyPair.secret),
+      secretHash: await hashAPISecret(keyPair.secret),
       userEmail: 'test@example.com',
       userRoles: ['User'],
       createdAt: new Date(),
@@ -439,7 +440,7 @@ describe('API Key Permissions', () => {
 
     const record: APIKeyRecord = {
       keyHash,
-      secretHash: await hashAPIKey(keyPair.secret),
+      secretHash: await hashAPISecret(keyPair.secret),
       userEmail: 'test@example.com',
       userRoles: ['User'],
       createdAt: new Date(),
@@ -566,7 +567,7 @@ describe('API Key Scopes', () => {
 
     const record: APIKeyRecord = {
       keyHash,
-      secretHash: await hashAPIKey(keyPair.secret),
+      secretHash: await hashAPISecret(keyPair.secret),
       userEmail: 'test@example.com',
       userRoles: ['User'],
       createdAt: new Date(),
@@ -591,7 +592,7 @@ describe('API Key Scopes', () => {
 
     const record: APIKeyRecord = {
       keyHash,
-      secretHash: await hashAPIKey(keyPair.secret),
+      secretHash: await hashAPISecret(keyPair.secret),
       userEmail: 'test@example.com',
       userRoles: ['Admin'],
       createdAt: new Date(),

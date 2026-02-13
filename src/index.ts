@@ -215,3 +215,34 @@ export type {
   AppRegistry,
   DependencyResolution,
 } from './apps/index.js';
+
+// API Methods
+export {
+  methodRoutes,
+  DefaultMethodRegistry,
+} from './api/method.js';
+
+export type {
+  MethodDefinition,
+  MethodRegistry,
+} from './api/method.js';
+
+// API Key Authentication
+export {
+  generateAPIKey,
+  hashAPIKey,
+  hashAPISecret,
+  verifyAPIKey,
+  revokeAPIKey,
+  getAPIKeyPermissions,
+  listUserAPIKeys,
+  rotateAPIKey,
+  DEFAULT_API_KEY_CONFIG,
+} from './auth/api-key.js';
+
+export type {
+  APIKeyConfig,
+  APIKeyRecord,
+  APIKeyPair,
+  APIKeyStore,
+} from './auth/api-key.js';
