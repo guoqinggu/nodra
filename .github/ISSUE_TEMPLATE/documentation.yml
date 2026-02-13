@@ -1,0 +1,64 @@
+name: Documentation Issue
+description: Report documentation errors or suggest improvements
+title: '[DOCS] '
+labels: ['documentation', 'triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve our documentation!
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Issue Type
+      options:
+        - Error/typo
+        - Missing information
+        - Unclear explanation
+        - Outdated content
+        - Suggestion for improvement
+    validations:
+      required: true
+
+  - type: dropdown
+    id: location
+    attributes:
+      label: Documentation Location
+      options:
+        - README.md
+        - AGENTS.md
+        - CLAUDE.md
+        - docs/en/ARCHITECTURE.md
+        - docs/en/API_REFERENCE.md
+        - docs/zh/ARCHITECTURE.md
+        - docs/zh/API_REFERENCE.md
+        - Other (specify below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Issue Description
+      description: Describe the issue or suggestion
+      placeholder: The documentation says... but it should be...
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Improvement
+      description: How would you improve it?
+      placeholder: It would be clearer if...
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission Checks
+      options:
+        - label: I have checked both English and Chinese documentation (if applicable)
+          required: false
+        - label: I have provided specific location/page references
+          required: true

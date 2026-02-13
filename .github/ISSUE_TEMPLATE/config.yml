@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question/Discussion
+    url: https://github.com/nodra/nodra/discussions
+    about: Ask questions or start discussions here
+  - name: Security Issue
+    url: https://github.com/nodra/nodra/security/advisories/new
+    about: Please report security vulnerabilities here
