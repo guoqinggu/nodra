@@ -16,12 +16,10 @@ export type PermissionAction = 'read' | 'write' | 'create' | 'delete' | 'submit'
  * User context for permission checks
  */
 export interface UserContext {
-  /** User email */
   email: string;
-  /** User's roles */
   roles: string[];
-  /** Whether user is the owner of the document */
   isOwner?: boolean;
+  department?: string;
 }
 
 /**

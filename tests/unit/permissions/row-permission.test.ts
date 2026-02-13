@@ -270,10 +270,12 @@ describe('Row Permission - Get Filter', () => {
   ];
 
   it('should generate filter for single field restriction', () => {
+    const perm = userPermissions[0];
+    if (!perm) return;
     const filter = getRowPermissionFilter({
       doctype: 'Lead',
       user: salesUser,
-      userPermissions: [userPermissions[0]],
+      userPermissions: [perm],
     });
 
     expect(filter).toEqual({
@@ -572,10 +574,10 @@ describe('Row Permission - Cross DocType Permissions', () => {
   const userPermissions: UserPermissionRule[] = [
     {
       doctype: 'Territory',
-      field: 'name',
+      field: 'territory',
       allowed_values: ['North America'],
       applicable_for: ['Sales User'],
-      apply_to_all_doctypes: true, // Applies to all doctypes with territory field
+      apply_to_all_doctypes: true,
     },
   ];
 
