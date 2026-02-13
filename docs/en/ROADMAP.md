@@ -6,451 +6,665 @@
 - **Incremental**: Each phase builds on the previous, always keeping the system runnable
 - **Git discipline**: Each significant feature/module is committed separately
 - **Multi-agent**: Development leverages specialized agents (core, db, api, test)
+- **No-Code First**: Prioritize visual interfaces to lower the barrier to entry
 
 ---
 
-## Phase 1: Project Bootstrap & Foundation
+## Completed Phases ✅
 
-### 1.1 Project Initialization
-- [ ] Initialize Node.js project with pnpm
-- [ ] Configure TypeScript (strict mode, ESM, path aliases)
-- [ ] Configure Vitest for testing
-- [ ] Configure tsup for building
-- [ ] Configure ESLint + Prettier
-- [ ] Set up .gitignore, .editorconfig
-- [ ] Create initial directory structure
+### Phase 1: Project Bootstrap & Foundation ✅
 
-### 1.2 Error System
-- [ ] Define error hierarchy (NodraError, ValidationError, etc.)
-- [ ] Implement error classes with proper stack traces
-- [ ] Map errors to HTTP status codes
-- [ ] Tests for all error types
+- [x] Initialize Node.js project with pnpm
+- [x] Configure TypeScript (strict mode, ESM, path aliases)
+- [x] Configure Vitest for testing
+- [x] Configure tsup for building
+- [x] Configure ESLint + Prettier
+- [x] Set up .gitignore, .editorconfig
+- [x] Create initial directory structure
+- [x] Define error hierarchy (NodraError, ValidationError, etc.)
+- [x] Implement error classes with proper stack traces
+- [x] Map errors to HTTP status codes
+- [x] Config loading from file + environment variables
+- [x] Structured JSON logger (using pino)
 
-### 1.3 Configuration System
-- [ ] Config loading from file + environment variables
-- [ ] Config schema validation
-- [ ] Default configuration values
-- [ ] Tests for config loading and validation
+### Phase 2: DocType System ✅
 
-### 1.4 Logger
-- [ ] Structured JSON logger (using pino)
-- [ ] Log levels: debug, info, warn, error
-- [ ] Request-scoped logging with correlation IDs
-- [ ] Tests for log output
+- [x] Define all field type enums and type mappings
+- [x] Field-to-PostgreSQL type mapping
+- [x] DocType definition interface (TypeScript)
+- [x] Field definition type system
+- [x] Permission definition type system
+- [x] Naming rule type system
+- [x] DocType loader implementation
+- [x] Standard fields injection (name, owner, creation, modified, etc.)
 
----
+### Phase 3: Database Layer ✅
 
-## Phase 2: DocType System
+- [x] pg Pool wrapper with configuration
+- [x] Connection health check
+- [x] Transaction support
+- [x] SELECT with column selection
+- [x] WHERE clause builder (=, !=, >, <, >=, <=, LIKE, IN, NOT IN, BETWEEN, IS NULL, IS NOT NULL)
+- [x] ORDER BY, LIMIT, OFFSET
+- [x] Generate CREATE TABLE for new DocTypes
+- [x] Generate ALTER TABLE for modified DocTypes (add columns)
+- [x] Create indexes from field definitions
 
-### 2.1 Field Types
-- [ ] Define all field type enums and type mappings
-- [ ] Field-to-PostgreSQL type mapping
-- [ ] Field validation rule mapping
-- [ ] Tests for type definitions and mappings
+### Phase 4: Document & ORM ✅
 
-### 2.2 DocType Schema
-- [ ] DocType definition interface (TypeScript)
-- [ ] JSON Schema for DocType validation
-- [ ] DocType definition parser
-- [ ] Standard fields injection (name, owner, creation, modified, etc.)
-- [ ] Tests for schema parsing and validation
+- [x] Document constructor from DocType + data
+- [x] Getter/setter for fields
+- [x] Dirty tracking (changed fields detection)
+- [x] isNew() detection
+- [x] Standard field population
+- [x] Insert document
+- [x] Read document
+- [x] Update document
+- [x] Delete document
+- [x] Required field validation
+- [x] Type validation
+- [x] Link existence validation
 
-### 2.3 DocType Loader
-- [ ] Load DocType JSON from filesystem
-- [ ] Validate against DocType JSON Schema
-- [ ] Resolve child DocType references
-- [ ] Tests with fixture DocTypes
+### Phase 5: REST API (Basic) ✅
 
-### 2.4 DocType Registry
-- [ ] In-memory DocType registry (singleton)
-- [ ] Register, lookup, list DocTypes
-- [ ] Dependency resolution (Link fields, child tables)
-- [ ] Module grouping
-- [ ] Tests for registry operations
+- [x] Fastify instance with TypeScript
+- [x] Error handler plugin
+- [x] JWT token generation and verification
+- [x] argon2 password hashing
+- [x] Session management
+- [x] Login/logout endpoints
+- [x] GET `/api/resource/:doctype` - list with filters, pagination, sorting
+- [x] GET `/api/resource/:doctype/:name` - get single document
+- [x] POST `/api/resource/:doctype` - create document
+- [x] PUT `/api/resource/:doctype/:name` - update document
+- [x] DELETE `/api/resource/:doctype/:name` - delete document
 
-### 2.5 Naming System
-- [ ] autoincrement naming (PostgreSQL SEQUENCE)
-- [ ] hash naming (random ID generation)
-- [ ] field-based naming
-- [ ] format naming (e.g., `TODO-{####}`)
-- [ ] expression naming
-- [ ] Tests for each naming strategy
+### Phase 6: Permission System (Basic) ✅
 
----
+- [x] User DocType definition
+- [x] Role DocType definition
+- [x] DocType-level permissions
+- [x] Basic permission checking
 
-## Phase 3: Database Layer
+### Phase 7: Hook & Event System ✅
 
-### 3.1 Connection Management
-- [ ] pg Pool wrapper with configuration
-- [ ] Connection health check
-- [ ] Graceful shutdown (drain pool)
-- [ ] Tests with real PostgreSQL (testcontainers or local)
+- [x] Typed event emitter
+- [x] Event listener registration
+- [x] before_validate, validate events
+- [x] before_save, after_save events
+- [x] before_delete, after_delete events
+- [x] Hook registration mechanism
 
-### 3.2 Query Builder
-- [ ] SELECT with column selection
-- [ ] WHERE clause builder (=, !=, >, <, >=, <=, LIKE, IN, NOT IN, BETWEEN, IS NULL, IS NOT NULL)
-- [ ] ORDER BY, LIMIT, OFFSET
-- [ ] INSERT with RETURNING
-- [ ] UPDATE with WHERE
-- [ ] DELETE with WHERE
-- [ ] Parameterized queries (SQL injection prevention)
-- [ ] Tests for all query types and edge cases
+### Phase 8: File Management (Basic) ✅
 
-### 3.3 Schema Sync Engine
-- [ ] Introspect existing database schema
-- [ ] Compare DocType definitions with DB schema
-- [ ] Generate CREATE TABLE for new DocTypes
-- [ ] Generate ALTER TABLE for modified DocTypes (add columns, change types)
-- [ ] Create indexes from field definitions
-- [ ] Handle child table relationships
-- [ ] Safety: never auto-drop columns
-- [ ] Tests for schema diffing and SQL generation
+- [x] File DocType definition
+- [x] Local filesystem storage
+- [x] File upload endpoint
+- [x] File type validation
 
-### 3.4 Transaction Support
-- [ ] Transaction wrapper with auto-rollback
-- [ ] Savepoint support
-- [ ] Tests for commit and rollback scenarios
+### Phase 9: Background Jobs ✅
 
-### 3.5 Migration System
-- [ ] Track applied migrations in database
-- [ ] Schema diff to generate migration scripts
-- [ ] Migration runner (up/down)
-- [ ] Data migration support
-- [ ] Tests for migration lifecycle
+- [x] PostgreSQL-based job queue (SKIP LOCKED)
+- [x] Cron expression parser
+- [x] Recurring job execution
+- [x] Worker pool management
+- [x] Job status tracking
+- [x] Retry logic with backoff
 
----
+### Phase 10: Real-time ✅
 
-## Phase 4: Document & ORM
+- [x] WebSocket server configuration
+- [x] Connection management
+- [x] Room management (doctype rooms, document rooms)
+- [x] Document change broadcasting
+- [x] Event broadcast mechanism
 
-### 4.1 Base Document Class
-- [ ] Document constructor from DocType + data
-- [ ] Getter/setter for fields with type coercion
-- [ ] Dirty tracking (changed fields detection)
-- [ ] isNew() detection
-- [ ] Standard field population (owner, creation, modified, modified_by)
-- [ ] Tests for document operations
+### Phase 11: Reporting (Basic) ✅
 
-### 4.2 Document Lifecycle
-- [ ] Hook manager (before/after pattern)
-- [ ] Execution order: beforeValidate → validate → beforeSave → DB → afterSave
-- [ ] Insert lifecycle: beforeInsert → (save lifecycle) → afterInsert
-- [ ] Submit lifecycle: beforeSubmit → (save lifecycle) → afterSubmit
-- [ ] Cancel lifecycle: beforeCancel → (save lifecycle) → afterCancel
-- [ ] Delete lifecycle: beforeDelete → DB → afterDelete
-- [ ] onChange detection and trigger
-- [ ] Tests for each lifecycle path
+- [x] SQL-based report definition
+- [x] TypeScript-based report logic
+- [x] Column formatting utilities
 
-### 4.3 Document Controller
-- [ ] Auto-discover controller files (.ts next to .json)
-- [ ] Controller class loading and instantiation
-- [ ] Override lifecycle hooks via controller
-- [ ] Tests for controller loading and hook execution
+### Phase 12: Workflow Engine ✅
 
-### 4.4 Child Documents
-- [ ] Table field handling (one-to-many)
-- [ ] append(), remove() for child rows
-- [ ] Child document validation
-- [ ] Save/load with parent
-- [ ] Cascade delete
-- [ ] Tests for child document operations
+- [x] Workflow DocType
+- [x] State definition with doc_status mapping
+- [x] Transition rules with role-based access
+- [x] Workflow executor
+- [x] Workflow history tracking
 
-### 4.5 ORM High-Level API
-- [ ] `nodra.getDoc(doctype, name)` - fetch single
-- [ ] `nodra.getDoc({doctype, ...fields})` - create new
-- [ ] `nodra.getList(doctype, options)` - list with filters
-- [ ] `nodra.getCount(doctype, filters)` - count
-- [ ] `nodra.getValue(doctype, name, field)` - get single value
-- [ ] `nodra.setValue(doctype, name, field, value)` - set single value
-- [ ] `nodra.deleteDoc(doctype, name)` - delete
-- [ ] `nodra.exists(doctype, name)` - check existence
-- [ ] `doc.save()`, `doc.insert()`, `doc.delete()`, `doc.submit()`, `doc.cancel()`
-- [ ] Tests for all ORM operations
+### Phase 13: CLI (Basic) ✅
 
-### 4.6 Validation Engine
-- [ ] Required field validation
-- [ ] Type validation (string, number, date, etc.)
-- [ ] Max length validation
-- [ ] Unique constraint validation
-- [ ] Select option validation
-- [ ] Link existence validation
-- [ ] Custom validator support
-- [ ] Collect all errors (not fail-fast)
-- [ ] Tests for each validation type
+- [x] `nodra new-site` - Create database and initial setup
+- [x] `nodra migrate` - Sync DocTypes to database
+- [x] `nodra start` - Start development server
+- [x] `nodra console` - Interactive REPL
+
+### Phase 14: App System (Basic) ✅
+
+- [x] App directory convention
+- [x] App dependency resolution
+- [x] App installation
+- [x] App uninstallation
 
 ---
 
-## Phase 5: REST API
+## In Progress 🔄
 
-### 5.1 Fastify Server Setup
-- [ ] Fastify instance with TypeScript
-- [ ] Plugin architecture (register pattern)
-- [ ] Request/response logging
-- [ ] Error handler plugin
-- [ ] CORS configuration
-- [ ] Tests for server boot
+### Phase 15: API Enhancement 🔄
 
-### 5.2 Resource Routes
-- [ ] GET `/api/resource/:doctype` - list with filters, pagination, sorting
-- [ ] GET `/api/resource/:doctype/:name` - get single document
-- [ ] POST `/api/resource/:doctype` - create document
-- [ ] PUT `/api/resource/:doctype/:name` - update document
-- [ ] DELETE `/api/resource/:doctype/:name` - delete document
-- [ ] GET `/api/resource/:doctype/count` - count
-- [ ] Request validation from DocType schema
-- [ ] Response serialization
-- [ ] Tests for each endpoint
+**Goal**: Complete API layer for third-party integration
 
-### 5.3 Method Routes
-- [ ] POST `/api/method/:path` - call whitelisted functions
-- [ ] `@whitelist` decorator for exposing functions
-- [ ] Argument parsing from request body
-- [ ] Tests for method calling
+- [ ] **15.1 Method Routes**
+  - [ ] POST `/api/method/{method_path}` implementation
+  - [ ] Method whitelist mechanism
+  - [ ] Parameter validation and serialization
+  - [ ] Permission check integration
 
-### 5.4 OpenAPI Generation
-- [ ] Auto-generate OpenAPI 3.0 spec from DocTypes
-- [ ] Swagger UI integration
-- [ ] Tests for spec generation
+- [ ] **15.2 API Key Authentication**
+  - [ ] API key generation and management
+  - [ ] API key authentication middleware
+  - [ ] API key permission scope control
+  - [ ] API key expiration and refresh
 
----
+- [ ] **15.3 OpenAPI Generation**
+  - [ ] Generate OpenAPI Schema from DocTypes
+  - [ ] Auto-generate API documentation
+  - [ ] Swagger UI integration
+  - [ ] API versioning
 
-## Phase 6: Authentication
+- [ ] **15.4 Advanced Query**
+  - [ ] Full-text search endpoint
+  - [ ] Aggregation query support
+  - [ ] Related query optimization
+  - [ ] Export functionality (CSV/Excel)
 
-### 6.1 Password Management
-- [ ] argon2 hashing and verification
-- [ ] Password strength validation
-- [ ] Tests for hashing
+### Phase 16: Permission System Enhancement 🔄
 
-### 6.2 Session Management
-- [ ] JWT token generation and verification
-- [ ] Refresh token rotation
-- [ ] Token expiry handling
-- [ ] Tests for session lifecycle
+**Goal**: Implement fine-grained permission control
 
-### 6.3 Auth Endpoints
-- [ ] POST `/api/method/login` - login with email/password
-- [ ] POST `/api/method/logout` - invalidate session
-- [ ] GET `/api/method/get_logged_user` - get current user
-- [ ] Tests for auth flows
+- [ ] **16.1 Field-Level Permissions**
+  - [ ] Field visibility control
+  - [ ] Field read/write permissions
+  - [ ] Field-level permission middleware
+  - [ ] API response field filtering
 
-### 6.4 API Key Authentication
-- [ ] API key generation per user
-- [ ] API key + secret authentication
-- [ ] Tests for API key auth
+- [ ] **16.2 Row-Level Permissions (User Permission)**
+  - [ ] Condition-based record filtering
+  - [ ] Link field value restrictions
+  - [ ] Row-level permission query optimization
+  - [ ] Permission caching
+
+- [ ] **16.3 Permission Middleware Integration**
+  - [ ] Authentication middleware enhancement
+  - [ ] Permission validation middleware
+  - [ ] Role hierarchy
+  - [ ] Permission audit logging
 
 ---
 
-## Phase 7: Permission System
+## Planned Phases 📋
 
-### 7.1 Role System
-- [ ] Role DocType
-- [ ] User-Role assignment
-- [ ] Role hierarchy / inheritance
-- [ ] Tests for role operations
+### Phase 17: Frontend Interface (Desk) 📋 **[HIGHEST PRIORITY]**
 
-### 7.2 DocType Permissions
-- [ ] Permission rules from DocType definition
-- [ ] CRUD permission checks (read, write, create, delete, submit, cancel)
-- [ ] Owner-based permissions (if_owner flag)
-- [ ] Tests for permission checks
+**Goal**: Build visual management interface for true no-code development
 
-### 7.3 User Permissions
-- [ ] User Permission DocType (restrict Link field values)
-- [ ] Auto-filter in getList based on user permissions
-- [ ] Tests for user permission filtering
+- [ ] **17.1 Desk Framework**
+  - [ ] Frontend tech stack selection (React/Vue + TypeScript)
+  - [ ] Project structure and build configuration
+  - [ ] Routing and navigation
+  - [ ] State management
+  - [ ] UI component library selection/development
+  - [ ] Theme and styling system
 
-### 7.4 Permission Middleware
-- [ ] Fastify preHandler for permission checks
-- [ ] Integrate with resource routes
-- [ ] Tests for middleware integration
+- [ ] **17.2 DocType Designer**
+  - [ ] Visual field drag-and-drop
+  - [ ] Field property configuration panel
+  - [ ] Field type selector
+  - [ ] Permission rule configuration UI
+  - [ ] Naming rule configuration
+  - [ ] Real-time preview
+  - [ ] JSON code editor (advanced mode)
+
+- [ ] **17.3 List View**
+  - [ ] List page layout
+  - [ ] Column display configuration
+  - [ ] Sorting and filtering UI
+  - [ ] Pagination component
+  - [ ] Bulk operations (delete, export)
+  - [ ] Quick search
+  - [ ] Saved filters
+  - [ ] View sharing
+
+- [ ] **17.4 Form View**
+  - [ ] Form layout rendering
+  - [ ] Field component mapping
+  - [ ] Field validation feedback
+  - [ ] Sub-table (Table field) editing
+  - [ ] Link field search selection
+  - [ ] File upload component
+  - [ ] Form action buttons (save, submit, cancel)
+  - [ ] Version history view
+
+- [ ] **17.5 Dashboard**
+  - [ ] Dashboard layout system
+  - [ ] Statistics card components
+  - [ ] Chart components (bar, line, pie)
+  - [ ] Recent activity feed
+  - [ ] Quick action shortcuts
+  - [ ] Custom dashboard builder
+
+- [ ] **17.6 Workflow Designer**
+  - [ ] Visual flowchart editor
+  - [ ] State node drag-and-drop
+  - [ ] Transition line configuration
+  - [ ] Condition rule settings
+  - [ ] Approver assignment
+  - [ ] Workflow preview
+
+- [ ] **17.7 Report Designer**
+  - [ ] Visual query builder
+  - [ ] Field selector
+  - [ ] Filter condition configuration
+  - [ ] Sort configuration
+  - [ ] Chart type selection
+  - [ ] Report preview
+  - [ ] Report scheduling
+
+- [ ] **17.8 System Administration**
+  - [ ] User management
+  - [ ] Role and permission configuration
+  - [ ] System settings
+  - [ ] App management
+  - [ ] Job queue monitoring
+  - [ ] Log viewer
+
+### Phase 18: Caching & Performance 📋
+
+**Goal**: Improve system performance for high concurrency
+
+- [ ] **18.1 In-Memory Cache**
+  - [ ] LRU cache implementation
+  - [ ] DocType definition caching
+  - [ ] Permission caching
+  - [ ] Query result caching
+
+- [ ] **18.2 Redis Integration**
+  - [ ] Redis connection management
+  - [ ] Distributed caching
+  - [ ] Session storage
+  - [ ] Real-time data caching
+
+- [ ] **18.3 Cache Strategies**
+  - [ ] Cache invalidation mechanism
+  - [ ] Cache warming
+  - [ ] Cache penetration protection
+  - [ ] Multi-level cache strategy
+
+- [ ] **18.4 Query Optimization**
+  - [ ] Query performance analysis
+  - [ ] N+1 query optimization
+  - [ ] Database connection pool tuning
+  - [ ] Slow query monitoring
+
+### Phase 19: File Management Enhancement 📋
+
+**Goal**: Support cloud storage and enterprise file management
+
+- [ ] **19.1 Cloud Storage Support**
+  - [ ] AWS S3 integration
+  - [ ] Alibaba Cloud OSS integration
+  - [ ] Storage backend abstraction
+  - [ ] Multi-storage switching
+
+- [ ] **19.2 File Processing**
+  - [ ] Image thumbnail generation
+  - [ ] File preview (PDF, images)
+  - [ ] Batch upload/download
+  - [ ] Folder management
+
+- [ ] **19.3 File Security**
+  - [ ] File access permissions
+  - [ ] Virus scan integration
+  - [ ] Sensitive file detection
+  - [ ] File encryption storage
+
+### Phase 20: Notifications & Communication 📋
+
+**Goal**: Implement complete notification system
+
+- [ ] **20.1 Email System**
+  - [ ] SMTP configuration
+  - [ ] Email template management
+  - [ ] Bulk email sending
+  - [ ] Email queue
+
+- [ ] **20.2 Notification Center**
+  - [ ] In-app notifications
+  - [ ] Notification templates
+  - [ ] Notification preferences
+  - [ ] Notification history
+
+- [ ] **20.3 Integration Notifications**
+  - [ ] Webhook support
+  - [ ] WeChat Work integration
+  - [ ] DingTalk integration
+  - [ ] Slack integration
+
+### Phase 21: Migration System 📋
+
+**Goal**: Complete database migration mechanism
+
+- [ ] **21.1 Migration Framework**
+  - [ ] Migration file format definition
+  - [ ] Migration generator
+  - [ ] Migration executor
+  - [ ] Migration rollback
+
+- [ ] **21.2 Migration Tools**
+  - [ ] `nodra migration:create` command
+  - [ ] `nodra migration:status` command
+  - [ ] Migration history tracking
+  - [ ] Data migration support
+
+### Phase 22: CLI Enhancement 📋
+
+**Goal**: Improve development efficiency
+
+- [ ] **22.1 Code Generation**
+  - [ ] `nodra generate:doctype` command
+  - [ ] `nodra generate:controller` command
+  - [ ] `nodra generate:app` command
+  - [ ] `nodra generate:migration` command
+
+- [ ] **22.2 Development Tools**
+  - [ ] `nodra dev` development mode (hot reload)
+  - [ ] `nodra doctor` system diagnostics
+  - [ ] `nodra benchmark` performance testing
+  - [ ] `nodra logs` log viewer
+
+- [ ] **22.3 Database Tools**
+  - [ ] `nodra db:backup` database backup
+  - [ ] `nodra db:restore` database restore
+  - [ ] `nodra db:reset` database reset
+
+### Phase 23: Full-Text Search 📋
+
+**Goal**: Implement powerful search functionality
+
+- [ ] **23.1 Search Engine Integration**
+  - [ ] PostgreSQL full-text search
+  - [ ] Elasticsearch integration (optional)
+  - [ ] Search index management
+  - [ ] Incremental index updates
+
+- [ ] **23.2 Search Features**
+  - [ ] Global search
+  - [ ] Advanced search filters
+  - [ ] Search suggestions (autocomplete)
+  - [ ] Search result highlighting
+
+### Phase 24: Deployment & Operations 📋
+
+**Goal**: Support production environment deployment
+
+- [ ] **24.1 Containerization**
+  - [ ] Dockerfile
+  - [ ] Docker Compose configuration
+  - [ ] Kubernetes deployment templates
+  - [ ] Helm Charts
+
+- [ ] **24.2 Monitoring & Logging**
+  - [ ] Prometheus metrics
+  - [ ] Grafana dashboards
+  - [ ] Distributed log collection
+  - [ ] Alerting system
+
+- [ ] **24.3 CI/CD**
+  - [ ] GitHub Actions workflows
+  - [ ] Automated testing
+  - [ ] Automated deployment
+  - [ ] Release process
+
+### Phase 25: Multi-Tenancy 📋
+
+**Goal**: Support SaaS deployment
+
+- [ ] **25.1 Tenant Isolation**
+  - [ ] Tenant identification mechanism
+  - [ ] Database-level isolation
+  - [ ] Schema-level isolation
+  - [ ] Row-level isolation
+
+- [ ] **25.2 Tenant Management**
+  - [ ] Tenant registration
+  - [ ] Tenant configuration
+  - [ ] Resource quotas
+  - [ ] Tenant billing
+
+### Phase 26: Ecosystem 📋
+
+**Goal**: Build developer ecosystem
+
+- [ ] **26.1 SDK Development**
+  - [ ] JavaScript/TypeScript SDK
+  - [ ] Python SDK
+  - [ ] API client generation
+
+- [ ] **26.2 Tool Integration**
+  - [ ] VS Code plugin
+  - [ ] Debugging tools
+  - [ ] Performance analysis tools
+
+- [ ] **26.3 App Marketplace**
+  - [ ] App package format specification
+  - [ ] App publishing process
+  - [ ] App version management
+  - [ ] App rating system
 
 ---
 
-## Phase 8: Hook & Event System
+## Development Timeline
 
-### 8.1 Event Emitter
-- [ ] Typed event emitter
-- [ ] Synchronous and asynchronous event handling
-- [ ] Event priority ordering
-- [ ] Tests for event emission and handling
+### Current Phase (In Progress)
 
-### 8.2 App Hooks
-- [ ] Hook registration from app hooks.ts
-- [ ] doc_events hooks
-- [ ] scheduler_events hooks
-- [ ] boot_session hooks
-- [ ] override_whitelisted_methods
-- [ ] Tests for hook registration and execution
+- **Phase 15**: API Enhancement (Method Routes, API Key, OpenAPI)
+- **Phase 16**: Permission System Enhancement (Field-level, Row-level)
 
----
+### Phase 1: No-Code MVP (2-3 months)
 
-## Phase 9: Workflow Engine
+**Goal**: Achieve basic no-code development capability
 
-### 9.1 Workflow Definition
-- [ ] Workflow DocType
-- [ ] State definition with doc_status mapping
-- [ ] Transition rules with role-based access
-- [ ] Tests for workflow definition parsing
+**Core Tasks**:
+1. **Phase 17.1-17.4**: Desk framework + DocType Designer + List/Form Views
+2. **Phase 15**: API Enhancement (support frontend calls)
+3. **Phase 16**: Permission System Enhancement
 
-### 9.2 Workflow Execution
-- [ ] Apply workflow to document lifecycle
-- [ ] State transition validation
-- [ ] Action execution
-- [ ] Integration with document save
-- [ ] Tests for workflow execution paths
+**Deliverables**:
+- Visual DocType Designer
+- Auto-generated list and form interfaces
+- Basic permission control
+- Simple app development through UI
 
----
+### Phase 2: Production Ready (3-4 months)
 
-## Phase 10: Background Jobs
+**Goal**: Reach production environment standards
 
-### 10.1 Job Queue
-- [ ] PostgreSQL-based job queue (SKIP LOCKED)
-- [ ] Job serialization/deserialization
-- [ ] Job status tracking (queued, active, completed, failed)
-- [ ] Dead letter queue
-- [ ] Tests for queue operations
+**Core Tasks**:
+1. **Phase 17.5-17.8**: Dashboard + Workflow Designer + Report Designer + System Admin
+2. **Phase 18**: Caching & Performance Optimization
+3. **Phase 19**: File Management Enhancement (Cloud Storage)
+4. **Phase 20**: Notifications & Communication
+5. **Phase 21**: Migration System
 
-### 10.2 Scheduler
-- [ ] Cron expression parser
-- [ ] Schedule job registration
-- [ ] Recurring job execution
-- [ ] Tests for scheduler
+**Deliverables**:
+- Complete visual development environment
+- Workflow and report designers
+- High-performance, scalable backend
+- Enterprise file management
 
-### 10.3 Worker
-- [ ] Worker pool management
-- [ ] Concurrency control
-- [ ] Retry logic with backoff
-- [ ] Graceful shutdown
-- [ ] Tests for worker lifecycle
+### Phase 3: Enterprise Grade (4-6 months)
 
----
+**Goal**: Support large-scale enterprise applications
 
-## Phase 11: Real-time
+**Core Tasks**:
+1. **Phase 22**: CLI Enhancement
+2. **Phase 23**: Full-Text Search
+3. **Phase 24**: Deployment & Operations
+4. **Phase 25**: Multi-Tenancy
+5. **Phase 26**: Ecosystem
 
-### 11.1 WebSocket Server
-- [ ] Fastify WebSocket plugin
-- [ ] Connection authentication
-- [ ] Room management (doctype rooms, document rooms)
-- [ ] Tests for WebSocket connections
-
-### 11.2 Document Events
-- [ ] Publish document changes to rooms
-- [ ] Client subscription management
-- [ ] Tests for document change broadcasting
+**Deliverables**:
+- Complete enterprise features
+- SaaS support
+- Developer tools and SDKs
+- App marketplace
 
 ---
 
-## Phase 12: File Management
+## Milestones
 
-### 12.1 File DocType
-- [ ] File DocType definition
-- [ ] File metadata storage
-- [ ] Tests for file CRUD
+### 🎯 No-Code MVP (3 months)
 
-### 12.2 Upload Handling
-- [ ] Multipart upload endpoint
-- [ ] File size limits
-- [ ] File type validation
-- [ ] Tests for upload
+- [ ] Desk frontend framework
+- [ ] Visual DocType Designer
+- [ ] List and Form views
+- [ ] Basic permission control
+- [ ] Simple app creation through UI
 
-### 12.3 Storage Backends
-- [ ] Local filesystem storage
-- [ ] S3-compatible storage (future)
-- [ ] Tests for storage operations
+### 🚀 Beta Version (6 months)
 
----
+- [ ] Complete frontend interface (Desk)
+- [ ] Workflow Designer
+- [ ] Report Designer
+- [ ] Dashboard Builder
+- [ ] Caching and performance optimization
+- [ ] Cloud storage support
 
-## Phase 13: Reporting
+### ⭐ Production Version (12 months)
 
-### 13.1 Query Reports
-- [ ] SQL-based report definition
-- [ ] Parameterized queries
-- [ ] Column definition and formatting
-- [ ] Tests for report execution
+- [ ] Full-text search
+- [ ] Complete CLI tools
+- [ ] Docker/K8s deployment
+- [ ] Monitoring and logging system
+- [ ] Complete documentation and tutorials
 
-### 13.2 Script Reports
-- [ ] TypeScript-based report logic
-- [ ] Data processing pipeline
-- [ ] Tests for script reports
+### 🏆 Enterprise Version (18 months)
 
----
-
-## Phase 14: CLI
-
-### 14.1 Core Commands
-- [ ] `nodra new-site` - Create database and initial setup
-- [ ] `nodra migrate` - Sync DocTypes to database
-- [ ] `nodra start` - Start development server
-- [ ] `nodra console` - Interactive REPL with nodra API
-- [ ] Tests for CLI commands
-
-### 14.2 App Commands
-- [ ] `nodra new-app` - Scaffold new application
-- [ ] `nodra install-app` - Install app to site
-- [ ] `nodra uninstall-app` - Remove app from site
-- [ ] Tests for app management
+- [ ] Multi-tenancy support
+- [ ] App marketplace
+- [ ] SDKs and development tools
+- [ ] Advanced security features
+- [ ] Enterprise support services
 
 ---
 
-## Phase 15: App System
+## Development Priorities (Updated)
 
-### 15.1 App Structure
-- [ ] App directory convention
-- [ ] App manifest (package.json extensions)
-- [ ] DocType discovery from app directories
-- [ ] Tests for app loading
+### 🔥 Highest Priority (No-Code Core)
 
-### 15.2 App Lifecycle
-- [ ] App installation (run setup, install DocTypes)
-- [ ] App removal (cleanup)
-- [ ] App dependency resolution
-- [ ] Tests for app lifecycle
+1. **Desk Frontend Interface**: This is the key to achieving no-code development
+2. **API Enhancement**: Method Routes, API Key, OpenAPI Generation
+3. **Permission System Enhancement**: Field-level, Row-level permissions
 
----
+### 🔶 High Priority (Production Required)
 
-## Phase 16: Core DocTypes
+4. **Caching & Performance**: Redis, Multi-level caching, Query optimization
+5. **File Management Enhancement**: Cloud Storage (S3/OSS)
+6. **Notification System**: Email, Webhook, Integrations
+7. **Migration System**: Complete database migrations
 
-### 16.1 Meta DocTypes
-- [ ] DocType (meta-DocType that describes DocTypes)
-- [ ] DocField (child of DocType)
-- [ ] DocPerm (child of DocType)
-- [ ] Module Def
+### 🟡 Medium Priority (Experience Optimization)
 
-### 16.2 User & Access
-- [ ] User
-- [ ] Role
-- [ ] User Role (child)
-- [ ] User Permission
+8. **CLI Enhancement**: Code generation, Development tools
+9. **Full-Text Search**: PostgreSQL/Elasticsearch
+10. **Workflow Designer**: Visual flow design
 
-### 16.3 System
-- [ ] File
-- [ ] Workflow
-- [ ] Workflow State (child)
-- [ ] Workflow Transition (child)
+### 🔷 Low Priority (Enterprise Grade)
+
+11. **Deployment & Operations**: Docker, K8s, Monitoring
+12. **Multi-Tenancy**: SaaS support
+13. **Ecosystem**: SDKs, App marketplace
 
 ---
 
-## Git Commit Strategy
+## Resource Allocation Recommendations
 
-Each phase and sub-section should be committed separately with descriptive messages:
+### Team Configuration
+
+**Current Phase (No-Code MVP)**:
+- 1 Frontend Developer (Desk Interface)
+- 1 Backend Developer (API Enhancement, Permission Enhancement)
+- 1 Full-Stack (DocType Designer, Frontend-Backend Integration)
+
+**Production Ready Phase**:
+- 2 Frontend Developers
+- 2 Backend Developers
+- 1 DevOps Engineer
+
+### Time Allocation
 
 ```
-feat(core): add error hierarchy with HTTP status mapping
-feat(doctype): implement DocType schema parser and validator
-feat(database): add connection pool with health checks
-feat(orm): implement base Document class with lifecycle hooks
-feat(api): auto-generate REST endpoints from DocTypes
-feat(auth): add JWT session management with argon2
-feat(permissions): implement role-based DocType permissions
-feat(workflow): add state-machine workflow engine
-feat(jobs): implement PostgreSQL-based job queue
-feat(realtime): add WebSocket document change notifications
-feat(cli): implement nodra new-site and migrate commands
+No-Code MVP Phase:
+├── Desk Frontend Framework: 40%
+├── DocType Designer: 25%
+├── List/Form Views: 20%
+├── API Enhancement: 10%
+└── Permission Enhancement: 5%
+
+Production Ready Phase:
+├── Frontend Feature Completion: 35%
+├── Performance Optimization: 20%
+├── File/Notification System: 20%
+├── Migration/CLI Tools: 15%
+└── Testing/Documentation: 10%
 ```
 
-Testing commits should accompany or precede feature commits (TDD):
+---
 
-```
-test(doctype): add DocType schema validation tests
-test(database): add query builder tests with edge cases
-test(orm): add Document lifecycle integration tests
-```
+## Quality Standards
+
+### Code Quality
+
+- **Test Coverage**: Unit tests > 80%, Integration tests > 70%
+- **Code Standards**: ESLint + Prettier, strict TypeScript configuration
+- **Code Review**: All PRs must be reviewed
+- **Documentation**: All public APIs must be documented
+
+### Performance Standards
+
+- **API Response Time**: < 200ms (P95)
+- **Frontend First Paint**: < 3 seconds
+- **Throughput**: 1000+ concurrent requests
+- **Availability**: 99.9% uptime
+
+### Security Standards
+
+- **Dependency Security**: Regular security scans and updates
+- **Code Security**: Security code reviews
+- **Data Security**: Encrypted transmission and storage
+- **Access Control**: Fine-grained permission control
+
+---
+
+## Summary
+
+The Nodra backend framework is already quite mature (~70-80% complete), with core features including DocType system, ORM, API, workflow, job queue, and real-time communication all implemented and tested.
+
+**The most critical task now is developing the Desk frontend interface**, which is essential for achieving no-code development. Without a visual interface, users still need to hand-write JSON to define DocTypes, which doesn't demonstrate the value of a no-code platform.
+
+It is recommended to immediately start **Phase 17: Frontend Interface (Desk)** development, while completing **Phase 15-16** API and permission enhancements in parallel to support frontend functionality requirements.
+
+---
+
+## Next Actions
+
+1. **Review this plan**: Team discussion and plan confirmation
+2. **Tech stack selection**: Finalize frontend technology stack
+3. **Create tasks**: Break down plan into specific development tasks
+4. **Start development**: Begin development following module order
+5. **Regular check-ins**: Weekly progress reviews, plan adjustments
+
+---
+
+*This plan is based on analysis of the current codebase state and may need adjustment during actual execution based on specific circumstances.*
