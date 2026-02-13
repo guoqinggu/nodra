@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Fastify from 'fastify';
 import { methodRoutes } from '../../../src/api/method.js';
 import { errorHandlerPlugin } from '../../../src/api/error-handler.js';
-import { AuthenticationError, PermissionError, ValidationError } from '../../../src/core/errors.js';
+import { PermissionError, ValidationError } from '../../../src/core/errors.js';
 import type { UserContext } from '../../../src/permissions/permission.js';
 
 // ---------------------------------------------------------------------------
@@ -32,7 +32,7 @@ class MethodRegistry {
   ): void {
     this.methods.set(path, {
       handler,
-      requireAuth: options.requireAuth ?? true,
+      requireAuth: options.requireAuth ?? false,
       requiredRoles: options.requiredRoles ?? [],
     });
   }
@@ -56,14 +56,6 @@ class MethodRegistry {
 
 function createMockMethodRegistry(): MethodRegistry {
   return new MethodRegistry();
-}
-
-function createMockAuthMiddleware(user: UserContext | null = null) {
-  return async (request: { user?: UserContext }, reply: unknown) => {
-    if (user) {
-      request.user = user;
-    }
-  };
 }
 
 // ---------------------------------------------------------------------------
@@ -197,7 +189,11 @@ describe('Method Routes - Authentication', () => {
   });
 
   it('should reject unauthenticated request to protected method', async () => {
-    methodRegistry.register('protected.data', () => ({ secret: 'data' }));
+    methodRegistry.register(
+      'protected.data',
+      () => ({ secret: 'data' }),
+      { requireAuth: true }
+    );
 
     const response = await app.inject({
       method: 'POST',
@@ -212,7 +208,11 @@ describe('Method Routes - Authentication', () => {
   });
 
   it('should allow authenticated request to protected method', async () => {
-    methodRegistry.register('protected.data', () => ({ secret: 'data' }));
+    methodRegistry.register(
+      'protected.data',
+      () => ({ secret: 'data' }),
+      { requireAuth: true }
+    );
 
     const response = await app.inject({
       method: 'POST',
@@ -276,7 +276,7 @@ describe('Method Routes - Authorization', () => {
     methodRegistry.register(
       'admin.only',
       () => ({ adminData: 'secret' }),
-      { requiredRoles: ['Admin'] },
+      { requireAuth: true, requiredRoles: ['Admin'] },
     );
 
     const response = await app.inject({
@@ -325,9 +325,9 @@ describe('Method Routes - Error Handling', () => {
 
   it('should handle ValidationError from method', async () => {
     methodRegistry.register('test.validate', () => {
-      throw new ValidationError('Invalid input', [
-        { field: 'email', message: 'Invalid email format' },
-      ]);
+      throw new ValidationError('Invalid input', {
+        details: [{ field: 'email', message: 'Invalid email format' }],
+      });
     });
 
     const response = await app.inject({
@@ -338,8 +338,8 @@ describe('Method Routes - Error Handling', () => {
 
     expect(response.statusCode).toBe(400);
     const body = JSON.parse(response.payload);
-    expect(body.error).toBe('Validation failed');
-    expect(body.details).toHaveLength(1);
+    expect(body.error.message).toBe('Invalid input');
+    expect(body.error.details).toHaveLength(1);
   });
 
   it('should handle PermissionError from method', async () => {
@@ -354,7 +354,7 @@ describe('Method Routes - Error Handling', () => {
     });
 
     expect(response.statusCode).toBe(403);
-    expect(JSON.parse(response.payload).error).toBe('You cannot perform this action');
+    expect(JSON.parse(response.payload).error.message).toBe('You cannot perform this action');
   });
 
   it('should handle unexpected errors with 500', async () => {

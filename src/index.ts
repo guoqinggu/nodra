@@ -37,10 +37,7 @@ export type {
 export type { NodraConfig } from './core/config.js';
 
 // Events
-export {
-  EventEmitter,
-  EVENT_PRIORITY_VALUES,
-} from './events/index.js';
+export { EventEmitter, EVENT_PRIORITY_VALUES } from './events/index.js';
 
 export type {
   EventType,
@@ -181,12 +178,7 @@ export type {
 } from './reports/index.js';
 
 // CLI
-export {
-  NewSiteCommand,
-  MigrateCommand,
-  StartCommand,
-  ConsoleCommand,
-} from './cli/index.js';
+export { NewSiteCommand, MigrateCommand, StartCommand, ConsoleCommand } from './cli/index.js';
 
 export type {
   Command,
@@ -215,3 +207,52 @@ export type {
   AppRegistry,
   DependencyResolution,
 } from './apps/index.js';
+
+// API Methods
+export { methodRoutes, DefaultMethodRegistry } from './api/method.js';
+
+export type { MethodDefinition, MethodRegistry } from './api/method.js';
+
+// API Key Authentication
+export {
+  generateAPIKey,
+  hashAPIKey,
+  hashAPISecret,
+  verifyAPIKey,
+  revokeAPIKey,
+  getAPIKeyPermissions,
+  listUserAPIKeys,
+  rotateAPIKey,
+  DEFAULT_API_KEY_CONFIG,
+} from './auth/api-key.js';
+
+export type { APIKeyConfig, APIKeyRecord, APIKeyPair, APIKeyStore } from './auth/api-key.js';
+
+// Permissions
+export {
+  hasPermission,
+  assertPermission,
+  getAccessibleDocTypes,
+  hasAnyPermission,
+} from './permissions/permission.js';
+
+export {
+  hasFieldPermission,
+  getVisibleFields,
+  getEditableFields,
+  filterDocumentByFieldPermissions,
+  assertFieldPermission,
+} from './permissions/field-permission.js';
+
+export {
+  hasRowPermission,
+  getRowPermissionFilter,
+  applyRowPermissions,
+  checkUserPermission,
+} from './permissions/row-permission.js';
+
+export type { UserContext, PermissionAction } from './permissions/permission.js';
+
+export type { FieldPermissionRule } from './permissions/field-permission.js';
+
+export type { UserPermissionRule, RowPermissionContext } from './permissions/row-permission.js';

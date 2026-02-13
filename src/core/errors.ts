@@ -106,11 +106,19 @@ export class PermissionError extends NodraError {
   public readonly doctype?: string;
   public readonly action?: string;
 
-  constructor(doctype: string, action: string, message?: string) {
-    super(message ?? `You do not have permission to ${action} ${doctype}`, 403);
+  constructor(
+    doctypeOrMessage: string,
+    action?: string,
+    message?: string
+  ) {
+    if (action === undefined) {
+      super(doctypeOrMessage, 403);
+    } else {
+      super(message ?? `You do not have permission to ${action} ${doctypeOrMessage}`, 403);
+      this.doctype = doctypeOrMessage;
+      this.action = action;
+    }
     this.name = 'PermissionError';
-    this.doctype = doctype;
-    this.action = action;
   }
 }
 
