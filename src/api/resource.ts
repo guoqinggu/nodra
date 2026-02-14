@@ -9,6 +9,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import type { ORM, ListOptions } from '../orm/crud.js';
 import type { DocTypeRegistry } from '../core/doctype/registry.js';
 import { Document } from '../core/document/document.js';
+import { fullTextSearch, aggregateQuery, exportData } from './advanced-query.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -190,6 +191,122 @@ export function resourceRoutes(
 
       await orm.deleteDoc(doctype, name);
       return reply.send({ message: 'ok' });
+    },
+  );
+
+  // -----------------------------------------------------------------------
+  // GET /api/resource/:doctype/search — full-text search
+  // -----------------------------------------------------------------------
+
+  app.get(
+    '/api/resource/:doctype/search',
+    async (
+      request: FastifyRequest<{
+        Params: { doctype: string };
+        Querystring: { search?: string; fields?: string; limit?: string; offset?: string };
+      }>,
+      reply: FastifyReply,
+    ) => {
+      const { doctype } = request.params;
+      const query = request.query;
+
+      if (!query.search) {
+        return reply.status(400).send({ error: 'search parameter required' });
+      }
+
+      ensureDocType(registry, doctype);
+
+      const fields = query.fields?.split(',').map((f) => f.trim());
+      const limit = parseInt(query.limit || '20', 10);
+      const offset = parseInt(query.offset || '0', 10);
+
+      const results = await fullTextSearch(orm.database, {
+        doctype,
+        searchText: query.search,
+        fields,
+        limit,
+        offset,
+      });
+
+      return { data: results };
+    },
+  );
+
+  // -----------------------------------------------------------------------
+  // GET /api/resource/:doctype/aggregate — aggregation
+  // -----------------------------------------------------------------------
+
+  app.get(
+    '/api/resource/:doctype/aggregate',
+    async (
+      request: FastifyRequest<{
+        Params: { doctype: string };
+        Querystring: { field: string; operation?: string; group_by?: string };
+      }>,
+      reply: FastifyReply,
+    ) => {
+      const { doctype } = request.params;
+      const query = request.query;
+
+      if (!query.field || !query.operation) {
+        return reply.status(400).send({ error: 'field and operation required' });
+      }
+
+      ensureDocType(registry, doctype);
+
+      const results = await aggregateQuery(orm.database, {
+        doctype,
+        field: query.field,
+        operation: query.operation as 'count' | 'sum' | 'avg' | 'min' | 'max',
+        groupBy: query.group_by,
+      });
+
+      return { data: results };
+    },
+  );
+
+  // -----------------------------------------------------------------------
+  // GET /api/resource/:doctype/export — export data
+  // -----------------------------------------------------------------------
+
+  app.get(
+    '/api/resource/:doctype/export',
+    async (
+      request: FastifyRequest<{
+        Params: { doctype: string };
+        Querystring: { format?: string; fields?: string; filters?: string };
+      }>,
+      reply: FastifyReply,
+    ) => {
+      const { doctype } = request.params;
+      const query = request.query;
+
+      if (!query.format || !['json', 'csv', 'xlsx'].includes(query.format)) {
+        return reply.status(400).send({ error: 'format required (json/csv/xlsx)' });
+      }
+
+      ensureDocType(registry, doctype);
+
+      const fields = query.fields?.split(',').map((f) => f.trim());
+      const filters = query.filters ? JSON.parse(query.filters) : undefined;
+
+      const data = await exportData(orm.database, {
+        doctype,
+        format: query.format as 'json' | 'csv' | 'xlsx',
+        fields,
+        filters,
+      });
+
+      const contentType: Record<string, string> = {
+        json: 'application/json',
+        csv: 'text/csv',
+        xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      };
+
+      reply.header('Content-Type', contentType[query.format]);
+      reply.header('Content-Disposition', `attachment; filename="${doctype}.${query.format}"`);
+
+      return data;
     },
   );
 }
