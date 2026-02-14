@@ -86,7 +86,7 @@ export async function exportData(db: Database, options: ExportOptions) {
     case 'csv':
       return convertToCSV(rows);
     case 'xlsx':
-      return convertToExcel(rows);
+      return await convertToExcel(rows);
     default:
       return rows;
   }
@@ -98,8 +98,17 @@ export function convertToCSV(data: Record<string, unknown>[]): string {
   return parser.parse(data);
 }
 
-export function convertToExcel(data: Record<string, unknown>[]): Buffer {
-  const XLSX = require('xlsx');
+let xlsxPackage: typeof import('xlsx') | null = null;
+
+async function getXlsx() {
+  if (!xlsxPackage) {
+    xlsxPackage = await import('xlsx');
+  }
+  return xlsxPackage;
+}
+
+export async function convertToExcel(data: Record<string, unknown>[]): Promise<Buffer> {
+  const XLSX = await getXlsx();
   const worksheet = XLSX.utils.json_to_sheet(data);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');

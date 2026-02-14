@@ -8,14 +8,6 @@ interface OpenAPISchema {
   enum?: string[];
 }
 
-interface OpenAPIParameter {
-  name: string;
-  in: string;
-  required: boolean;
-  schema: OpenAPISchema;
-  description?: string;
-}
-
 export function convertFieldToSchema(field: FieldDefinition): OpenAPISchema {
   const schema: OpenAPISchema = { type: 'string' };
   const fieldtype = field.fieldtype;
@@ -81,7 +73,6 @@ export function generateDocTypeSchema(doctype: DocTypeDefinition): OpenAPISchema
 
 export function generateCRUDRoutes(doctype: DocTypeDefinition): Record<string, unknown> {
   const basePath = `/api/resource/${doctype.name}`;
-  const schema = generateDocTypeSchema(doctype);
 
   return {
     [`${basePath}`]: {
