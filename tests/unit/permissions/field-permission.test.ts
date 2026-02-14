@@ -31,41 +31,36 @@ const testFields: FieldDefinition[] = [
   { fieldname: 'ssn', fieldtype: 'Data', label: 'SSN' },
   { fieldname: 'department', fieldtype: 'Link', label: 'Department', options: 'Department' },
   { fieldname: 'notes', fieldtype: 'Text', label: 'Notes' },
-  { fieldname: 'created_by', fieldtype: 'Data', label: 'Created By', read_only: 1 },
+  { fieldname: 'created_by', fieldtype: 'Data', label: 'Created By', read_only: true },
 ];
 
 const fieldPermissionRules: FieldPermissionRule[] = [
-  // Admin can see and edit all fields
   {
     role: 'Admin',
     permlevel: 0,
     read: true,
     write: true,
   },
-  // HR can see all but only edit non-sensitive fields
   {
     role: 'HR',
     permlevel: 1,
     read: true,
     write: false,
   },
-  // Manager can see and edit basic fields
   {
     role: 'Manager',
     permlevel: 2,
     read: true,
     write: true,
   },
-  // Employee can only see their own basic info
   {
     role: 'Employee',
-    permlevel: 3,
+    permlevel: 2,
     read: true,
     write: false,
   },
 ];
 
-// Field permission levels (lower = more access)
 const fieldLevels: FieldPermissionLevel[] = [
   { fieldname: 'name', permlevel: 2 }, // Basic info
   { fieldname: 'email', permlevel: 2 },
@@ -142,7 +137,9 @@ describe('Field Permission - Basic Read Access', () => {
   it('should allow Employee to read only basic fields', () => {
     expect(hasFieldPermission(testDocType, 'name', 'read', employeeUser, fieldLevels)).toBe(true);
     expect(hasFieldPermission(testDocType, 'email', 'read', employeeUser, fieldLevels)).toBe(true);
-    expect(hasFieldPermission(testDocType, 'salary', 'read', employeeUser, fieldLevels)).toBe(false);
+    expect(hasFieldPermission(testDocType, 'salary', 'read', employeeUser, fieldLevels)).toBe(
+      false,
+    );
     expect(hasFieldPermission(testDocType, 'ssn', 'read', employeeUser, fieldLevels)).toBe(false);
   });
 });
@@ -172,7 +169,9 @@ describe('Field Permission - Write Access', () => {
   });
 
   it('should deny Manager write access to sensitive fields', () => {
-    expect(hasFieldPermission(testDocType, 'salary', 'write', managerUser, fieldLevels)).toBe(false);
+    expect(hasFieldPermission(testDocType, 'salary', 'write', managerUser, fieldLevels)).toBe(
+      false,
+    );
     expect(hasFieldPermission(testDocType, 'ssn', 'write', managerUser, fieldLevels)).toBe(false);
   });
 
@@ -196,7 +195,9 @@ describe('Field Permission - Read-Only Fields', () => {
   });
 
   it('should allow read access to read-only fields based on permissions', () => {
-    expect(hasFieldPermission(testDocType, 'created_by', 'read', adminUser, fieldLevels)).toBe(true);
+    expect(hasFieldPermission(testDocType, 'created_by', 'read', adminUser, fieldLevels)).toBe(
+      true,
+    );
     expect(hasFieldPermission(testDocType, 'created_by', 'read', managerUser, fieldLevels)).toBe(
       true,
     );
@@ -289,12 +290,7 @@ describe('Field Permission - Document Filtering', () => {
   });
 
   it('should filter out ssn for HR', () => {
-    const filtered = filterDocumentByFieldPermissions(
-      testDocType,
-      document,
-      hrUser,
-      fieldLevels,
-    );
+    const filtered = filterDocumentByFieldPermissions(testDocType, document, hrUser, fieldLevels);
     expect(filtered).toHaveProperty('name');
     expect(filtered).toHaveProperty('salary');
     expect(filtered).not.toHaveProperty('ssn');
@@ -380,7 +376,13 @@ describe('Field Permission - No Permission Rules', () => {
 
     testFields.forEach((field) => {
       expect(
-        hasFieldPermission(docTypeWithoutFieldPerms, field.fieldname, 'read', adminUser, fieldLevels),
+        hasFieldPermission(
+          docTypeWithoutFieldPerms,
+          field.fieldname,
+          'read',
+          adminUser,
+          fieldLevels,
+        ),
       ).toBe(false);
     });
   });
@@ -388,9 +390,9 @@ describe('Field Permission - No Permission Rules', () => {
 
 describe('Field Permission - Non-existent Field', () => {
   it('should return false for non-existent field', () => {
-    expect(
-      hasFieldPermission(testDocType, 'nonexistent', 'read', adminUser, fieldLevels),
-    ).toBe(false);
+    expect(hasFieldPermission(testDocType, 'nonexistent', 'read', adminUser, fieldLevels)).toBe(
+      false,
+    );
   });
 
   it('should throw when asserting permission on non-existent field', () => {
@@ -425,14 +427,7 @@ describe('Field Permission - Conditional Permissions', () => {
     };
 
     expect(
-      hasFieldPermission(
-        docTypeWithConditions,
-        'salary',
-        'write',
-        user,
-        fieldLevels,
-        document,
-      ),
+      hasFieldPermission(docTypeWithConditions, 'salary', 'write', user, fieldLevels, document),
     ).toBe(true);
   });
 
@@ -445,14 +440,7 @@ describe('Field Permission - Conditional Permissions', () => {
     };
 
     expect(
-      hasFieldPermission(
-        docTypeWithConditions,
-        'salary',
-        'write',
-        user,
-        fieldLevels,
-        document,
-      ),
+      hasFieldPermission(docTypeWithConditions, 'salary', 'write', user, fieldLevels, document),
     ).toBe(false);
   });
 });

@@ -14,7 +14,12 @@ import type { FieldType } from './field-types.js';
 export type NamingRule = 'autoincrement' | 'hash' | 'field' | 'format' | 'prompt' | 'expression';
 
 const VALID_NAMING_RULES = new Set<string>([
-  'autoincrement', 'hash', 'field', 'format', 'prompt', 'expression',
+  'autoincrement',
+  'hash',
+  'field',
+  'format',
+  'prompt',
+  'expression',
 ]);
 
 export interface FieldDefinition {
@@ -48,6 +53,26 @@ export interface PermissionRule {
   if_owner: boolean;
 }
 
+/**
+ * Field-level permission rule
+ */
+export interface FieldPermissionRule {
+  role: string;
+  permlevel: number;
+  read: boolean;
+  write: boolean;
+  condition?: string;
+}
+
+/**
+ * Field permission level (threshold for field access)
+ */
+export interface FieldPermissionLevel {
+  fieldname: string;
+  permlevel: number;
+  read_only?: boolean;
+}
+
 export interface DocTypeDefinition {
   name: string;
   module: string;
@@ -59,6 +84,7 @@ export interface DocTypeDefinition {
   is_virtual: boolean;
   fields: FieldDefinition[];
   permissions: PermissionRule[];
+  field_permissions?: FieldPermissionRule[];
   search_fields?: string[];
   title_field?: string;
   sort_field?: string;
@@ -98,13 +124,19 @@ function validateField(raw: unknown, index: number): FieldDefinition {
   const { fieldname, fieldtype, label } = raw;
 
   if (typeof fieldname !== 'string' || fieldname === '') {
-    throw new ValidationError(`Field at index ${index}: "fieldname" is required and must be a non-empty string`);
+    throw new ValidationError(
+      `Field at index ${index}: "fieldname" is required and must be a non-empty string`,
+    );
   }
   if (typeof fieldtype !== 'string' || !isFieldType(fieldtype)) {
-    throw new ValidationError(`Field "${fieldname || index}": invalid fieldtype "${String(fieldtype)}"`);
+    throw new ValidationError(
+      `Field "${fieldname || index}": invalid fieldtype "${String(fieldtype)}"`,
+    );
   }
   if (typeof label !== 'string' || label === '') {
-    throw new ValidationError(`Field "${fieldname}": "label" is required and must be a non-empty string`);
+    throw new ValidationError(
+      `Field "${fieldname}": "label" is required and must be a non-empty string`,
+    );
   }
 
   return {
@@ -119,7 +151,9 @@ function validateField(raw: unknown, index: number): FieldDefinition {
     ...(raw['hidden'] !== undefined && { hidden: Boolean(raw['hidden']) }),
     ...(raw['read_only'] !== undefined && { read_only: Boolean(raw['read_only']) }),
     ...(raw['in_list_view'] !== undefined && { in_list_view: Boolean(raw['in_list_view']) }),
-    ...(raw['in_standard_filter'] !== undefined && { in_standard_filter: Boolean(raw['in_standard_filter']) }),
+    ...(raw['in_standard_filter'] !== undefined && {
+      in_standard_filter: Boolean(raw['in_standard_filter']),
+    }),
     ...(raw['search_index'] !== undefined && { search_index: Boolean(raw['search_index']) }),
     ...(raw['description'] !== undefined && { description: String(raw['description']) }),
     ...(raw['depends_on'] !== undefined && { depends_on: String(raw['depends_on']) }),
@@ -138,7 +172,9 @@ export function parseDocType(raw: unknown): DocTypeDefinition {
     throw new ValidationError('"name" is required and must be a non-empty string');
   }
   if (typeof module !== 'string' || module === '') {
-    throw new ValidationError(`DocType "${name}": "module" is required and must be a non-empty string`);
+    throw new ValidationError(
+      `DocType "${name}": "module" is required and must be a non-empty string`,
+    );
   }
 
   // Validate fields array
@@ -175,6 +211,18 @@ export function parseDocType(raw: unknown): DocTypeDefinition {
       }))
     : [];
 
+  // Parse field_permissions
+  const rawFieldPermissions = raw['field_permissions'];
+  const fieldPermissions: FieldPermissionRule[] = Array.isArray(rawFieldPermissions)
+    ? rawFieldPermissions.map((p) => ({
+        role: String((p as Record<string, unknown>)['role']),
+        permlevel: Number((p as Record<string, unknown>)['permlevel']) || 0,
+        read: Boolean((p as Record<string, unknown>)['read']),
+        write: Boolean((p as Record<string, unknown>)['write']),
+        condition: (p as Record<string, unknown>)['condition'] as string | undefined,
+      }))
+    : [];
+
   return {
     name,
     module,
@@ -186,6 +234,7 @@ export function parseDocType(raw: unknown): DocTypeDefinition {
     is_virtual: Boolean(raw['is_virtual']),
     fields,
     permissions,
+    ...(fieldPermissions.length > 0 && { field_permissions: fieldPermissions }),
     ...(raw['search_fields'] !== undefined && { search_fields: raw['search_fields'] as string[] }),
     ...(raw['title_field'] !== undefined && { title_field: String(raw['title_field']) }),
     ...(raw['sort_field'] !== undefined && { sort_field: String(raw['sort_field']) }),

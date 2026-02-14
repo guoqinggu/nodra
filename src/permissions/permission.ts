@@ -1,6 +1,6 @@
 /**
  * Permission System
- * 
+ *
  * Implements role-based access control (RBAC) with DocType-level permissions
  */
 
@@ -10,7 +10,14 @@ import { PermissionError } from '../core/errors.js';
 /**
  * Permission action types
  */
-export type PermissionAction = 'read' | 'write' | 'create' | 'delete' | 'submit' | 'cancel' | 'amend';
+export type PermissionAction =
+  | 'read'
+  | 'write'
+  | 'create'
+  | 'delete'
+  | 'submit'
+  | 'cancel'
+  | 'amend';
 
 /**
  * User context for permission checks
@@ -22,11 +29,13 @@ export interface UserContext {
   roles: string[];
   /** Whether user is the owner of the document */
   isOwner?: boolean;
+  /** User's department (for field-level permissions) */
+  department?: string;
 }
 
 /**
  * Check if user has permission to perform action on a DocType
- * 
+ *
  * @param doctype - DocType definition
  * @param action - Permission action to check
  * @param user - User context
@@ -37,7 +46,7 @@ export function hasPermission(
   doctype: DocTypeDefinition,
   action: PermissionAction,
   user: UserContext,
-  documentOwner?: string
+  documentOwner?: string,
 ): boolean {
   // System Manager has all permissions
   if (user.roles.includes('System Manager')) {
@@ -48,9 +57,10 @@ export function hasPermission(
   const isOwner = documentOwner ? user.email === documentOwner : false;
 
   // Find applicable permission rules for user's roles
-  const applicablePermissions = doctype.permissions?.filter((perm) => {
-    return user.roles.includes(perm.role);
-  }) ?? [];
+  const applicablePermissions =
+    doctype.permissions?.filter((perm) => {
+      return user.roles.includes(perm.role);
+    }) ?? [];
 
   if (applicablePermissions.length === 0) {
     return false;
@@ -75,7 +85,7 @@ export function hasPermission(
 
 /**
  * Assert that user has permission, throw error if not
- * 
+ *
  * @param doctype - DocType definition
  * @param action - Permission action to check
  * @param user - User context
@@ -86,13 +96,13 @@ export function assertPermission(
   doctype: DocTypeDefinition,
   action: PermissionAction,
   user: UserContext,
-  documentOwner?: string
+  documentOwner?: string,
 ): void {
   if (!hasPermission(doctype, action, user, documentOwner)) {
     throw new PermissionError(
       doctype.name,
       action,
-      `You do not have permission to ${action} ${doctype.name}`
+      `You do not have permission to ${action} ${doctype.name}`,
     );
   }
 }
@@ -123,15 +133,12 @@ function getPermissionForAction(perm: PermissionRule, action: PermissionAction):
 
 /**
  * Get all DocTypes that user has read access to
- * 
+ *
  * @param doctypes - Array of DocType definitions
  * @param user - User context
  * @returns Array of DocType names user can read
  */
-export function getAccessibleDocTypes(
-  doctypes: DocTypeDefinition[],
-  user: UserContext
-): string[] {
+export function getAccessibleDocTypes(doctypes: DocTypeDefinition[], user: UserContext): string[] {
   return doctypes
     .filter((doctype) => hasPermission(doctype, 'read', user))
     .map((doctype) => doctype.name);
@@ -139,7 +146,7 @@ export function getAccessibleDocTypes(
 
 /**
  * Check if user has any permission on a DocType
- * 
+ *
  * @param doctype - DocType definition
  * @param user - User context
  * @returns True if user has any permission
