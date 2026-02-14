@@ -14,6 +14,7 @@ import {
   type UserContext,
   getRoleHierarchy,
 } from '../permissions/permission.js';
+import { logPermissionCheck } from '../permissions/audit-log.js';
 import { AuthenticationError, PermissionError, NotFoundError } from '../core/errors.js';
 
 /**
@@ -151,9 +152,10 @@ export function createPermissionMiddleware(
 
     // For read/write/delete operations, check document owner if applicable
     let documentOwner: string | undefined;
+    let docName: string | undefined;
     if (['write', 'delete'].includes(action)) {
       const params = request.params as RequestParamsWithName;
-      const docName = params.name;
+      docName = params.name;
       if (docName) {
         try {
           const doc = await orm.getDoc(doctypeName, docName);
@@ -165,7 +167,19 @@ export function createPermissionMiddleware(
     }
 
     // Check permission
-    if (!hasPermission(doctype, action, userContext, documentOwner)) {
+    const hasPerm = hasPermission(doctype, action, userContext, documentOwner);
+
+    // Log permission check
+    await logPermissionCheck({
+      userEmail: user.email,
+      action,
+      doctype: doctypeName,
+      documentName: docName,
+      result: hasPerm ? 'Allowed' : 'Denied',
+      ipAddress: (request.ip as string) || 'unknown',
+    });
+
+    if (!hasPerm) {
       throw new PermissionError(
         doctypeName,
         action,
