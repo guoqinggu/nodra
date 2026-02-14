@@ -8,7 +8,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import type { ORM, ListOptions } from '../orm/crud.js';
 import type { DocTypeRegistry } from '../core/doctype/registry.js';
-import type { Database } from '../database/connection.js';
 import { Document } from '../core/document/document.js';
 import { fullTextSearch, aggregateQuery, exportData } from './advanced-query.js';
 
@@ -44,7 +43,6 @@ export function resourceRoutes(
   app: FastifyInstance,
   orm: ORM,
   registry: DocTypeRegistry,
-  db: Database,
 ): void {
   // -----------------------------------------------------------------------
   // GET /api/resource/:doctype — list
@@ -205,29 +203,24 @@ export function resourceRoutes(
     async (
       request: FastifyRequest<{
         Params: { doctype: string };
-        Querystring: {
-          search?: string;
-          fields?: string;
-          limit?: string;
-          offset?: string;
-        };
+        Querystring: { search?: string; fields?: string; limit?: string; offset?: string };
       }>,
       reply: FastifyReply,
     ) => {
       const { doctype } = request.params;
-      ensureDocType(registry, doctype);
-
       const query = request.query;
 
       if (!query.search) {
         return reply.status(400).send({ error: 'search parameter required' });
       }
 
+      ensureDocType(registry, doctype);
+
       const fields = query.fields?.split(',').map((f) => f.trim());
       const limit = parseInt(query.limit || '20', 10);
       const offset = parseInt(query.offset || '0', 10);
 
-      const results = await fullTextSearch(db, {
+      const results = await fullTextSearch(orm.database, {
         doctype,
         searchText: query.search,
         fields,
@@ -248,27 +241,23 @@ export function resourceRoutes(
     async (
       request: FastifyRequest<{
         Params: { doctype: string };
-        Querystring: {
-          field: string;
-          operation: 'count' | 'sum' | 'avg' | 'min' | 'max';
-          group_by?: string;
-        };
+        Querystring: { field: string; operation?: string; group_by?: string };
       }>,
       reply: FastifyReply,
     ) => {
       const { doctype } = request.params;
-      ensureDocType(registry, doctype);
-
       const query = request.query;
 
       if (!query.field || !query.operation) {
         return reply.status(400).send({ error: 'field and operation required' });
       }
 
-      const results = await aggregateQuery(db, {
+      ensureDocType(registry, doctype);
+
+      const results = await aggregateQuery(orm.database, {
         doctype,
         field: query.field,
-        operation: query.operation,
+        operation: query.operation as 'count' | 'sum' | 'avg' | 'min' | 'max',
         groupBy: query.group_by,
       });
 
@@ -277,7 +266,7 @@ export function resourceRoutes(
   );
 
   // -----------------------------------------------------------------------
-  // GET /api/resource/:doctype/export — data export
+  // GET /api/resource/:doctype/export — export data
   // -----------------------------------------------------------------------
 
   app.get(
@@ -285,29 +274,25 @@ export function resourceRoutes(
     async (
       request: FastifyRequest<{
         Params: { doctype: string };
-        Querystring: {
-          format: 'json' | 'csv' | 'xlsx';
-          fields?: string;
-          filters?: string;
-        };
+        Querystring: { format?: string; fields?: string; filters?: string };
       }>,
       reply: FastifyReply,
     ) => {
       const { doctype } = request.params;
-      ensureDocType(registry, doctype);
-
       const query = request.query;
 
-      if (!query.format) {
+      if (!query.format || !['json', 'csv', 'xlsx'].includes(query.format)) {
         return reply.status(400).send({ error: 'format required (json/csv/xlsx)' });
       }
+
+      ensureDocType(registry, doctype);
 
       const fields = query.fields?.split(',').map((f) => f.trim());
       const filters = query.filters ? JSON.parse(query.filters) : undefined;
 
-      const data = await exportData(db, {
+      const data = await exportData(orm.database, {
         doctype,
-        format: query.format,
+        format: query.format as 'json' | 'csv' | 'xlsx',
         fields,
         filters,
       });

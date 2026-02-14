@@ -41,10 +41,12 @@
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@types/argon2": "^0.15.4",
+    "@types/json2csv": "^5.0.7",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.2.2",
     "@types/pg": "^8.16.0",
     "@types/ws": "^8.18.1",
+    "@types/xlsx": "^0.0.36",
     "eslint": "^9.39.2",
     "prettier": "^3.8.1",
     "simple-git-hooks": "^2.9.0",

@@ -59,7 +59,7 @@ export class Nodra {
     this.server = Fastify({ logger: false });
     errorHandlerPlugin(this.server);
 
-    // Register Swagger UI
+    // Register Swagger
     await this.server.register(swagger, {
       openapi: {
         info: {
@@ -84,7 +84,7 @@ export class Nodra {
       routePrefix: '/api/docs/ui',
     });
 
-    resourceRoutes(this.server, this.orm, this.registry, this.db);
+    resourceRoutes(this.server, this.orm, this.registry);
     
     // Register auth routes
     authRoutes(this.server, this.orm, this.registry, {

@@ -1,12 +1,6 @@
-/**
- * Nodra Framework - OpenAPI Generator
- *
- * Generates OpenAPI 3.0 schema from DocType definitions.
- */
-
 import type { DocTypeDefinition, FieldDefinition } from '../core/doctype/schema.js';
 
-export interface OpenAPISchema {
+interface OpenAPISchema {
   type: string;
   properties?: Record<string, unknown>;
   required?: string[];
@@ -14,24 +8,12 @@ export interface OpenAPISchema {
   enum?: string[];
 }
 
-export interface OpenAPIParameter {
-  name: string;
-  in: string;
-  required: boolean;
-  schema: OpenAPISchema;
-  description?: string;
-}
-
-/**
- * Convert a DocType field to OpenAPI schema
- */
 export function convertFieldToSchema(field: FieldDefinition): OpenAPISchema {
   const schema: OpenAPISchema = { type: 'string' };
+  const fieldtype = field.fieldtype;
 
-  switch (field.fieldtype) {
-    case 'Data':
-      schema.type = 'string';
-      break;
+  switch (fieldtype) {
+    case 'Int':
     case 'Float':
     case 'Currency':
       schema.type = 'number';
@@ -42,23 +24,23 @@ export function convertFieldToSchema(field: FieldDefinition): OpenAPISchema {
     case 'Date':
     case 'Datetime':
       schema.type = 'string';
-      schema.format = field.fieldtype === 'Datetime' ? 'date-time' : 'date';
+      schema.format = fieldtype === 'Datetime' ? 'date-time' : 'date';
       break;
     case 'Text':
-    case 'LongText':
     case 'SmallText':
+    case 'LongText':
       schema.type = 'string';
       break;
-    case 'Select':
+    case 'Select': {
       schema.type = 'string';
-      if (field.options) {
-        const options = typeof field.options === 'string'
-          ? field.options.split('\n').map((opt) => opt.trim())
-          : field.options;
-        schema.enum = options.filter((opt) => opt.length > 0);
+      const options = field.options;
+      if (typeof options === 'string' && options) {
+        schema.enum = options.split('\n').map((opt) => opt.trim());
       }
       break;
+    }
     case 'Link':
+    case 'DynamicLink':
       schema.type = 'string';
       break;
     case 'Table':
@@ -71,9 +53,6 @@ export function convertFieldToSchema(field: FieldDefinition): OpenAPISchema {
   return schema;
 }
 
-/**
- * Generate OpenAPI schema from DocType definition
- */
 export function generateDocTypeSchema(doctype: DocTypeDefinition): OpenAPISchema {
   const properties: Record<string, OpenAPISchema> = {};
   const required: string[] = [];
@@ -92,9 +71,6 @@ export function generateDocTypeSchema(doctype: DocTypeDefinition): OpenAPISchema
   };
 }
 
-/**
- * Generate CRUD route definitions for a DocType
- */
 export function generateCRUDRoutes(doctype: DocTypeDefinition): Record<string, unknown> {
   const basePath = `/api/resource/${doctype.name}`;
 
