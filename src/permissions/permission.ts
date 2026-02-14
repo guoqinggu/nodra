@@ -148,3 +148,60 @@ export function hasAnyPermission(doctype: DocTypeDefinition, user: UserContext):
   const actions: PermissionAction[] = ['read', 'write', 'create', 'delete'];
   return actions.some((action) => hasPermission(doctype, action, user));
 }
+
+// ============================================================================
+// Role Hierarchy
+// ============================================================================
+
+/**
+ * Internal cache for role hierarchy
+ */
+const roleHierarchyCache = new Map<string, string[]>();
+
+/**
+ * Get all parent roles recursively
+ *
+ * @param roles - User's direct roles
+ * @param roleHierarchy - Map of role name to parent role
+ * @returns Expanded roles including all parent roles
+ */
+export function getRoleHierarchy(
+  roles: string[],
+  roleHierarchy?: Map<string, string>
+): string[] {
+  if (roles.length === 0) {
+    return [];
+  }
+
+  // Build role hierarchy map if not provided
+  const hierarchy = roleHierarchy ?? new Map<string, string>();
+
+  const expanded = new Set<string>(roles);
+  const visited = new Set<string>();
+
+  function expandRole(role: string): void {
+    if (visited.has(role)) {
+      return; // Prevent circular references
+    }
+    visited.add(role);
+
+    const parent = hierarchy.get(role);
+    if (parent && !visited.has(parent)) {
+      expanded.add(parent);
+      expandRole(parent);
+    }
+  }
+
+  for (const role of roles) {
+    expandRole(role);
+  }
+
+  return Array.from(expanded);
+}
+
+/**
+ * Clear role hierarchy cache
+ */
+export function clearRoleHierarchyCache(): void {
+  roleHierarchyCache.clear();
+}
