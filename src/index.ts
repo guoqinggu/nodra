@@ -253,6 +253,6 @@ export {
 
 export type { UserContext, PermissionAction } from './permissions/permission.js';
 
-export type { FieldPermissionRule, FieldPermissionLevel } from './permissions/field-permission.js';
+export type { FieldPermissionRule } from './permissions/field-permission.js';
 
 export type { UserPermissionRule, RowPermissionContext } from './permissions/row-permission.js';

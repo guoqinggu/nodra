@@ -1,6 +1,6 @@
 /**
  * Permission System
- *
+ * 
  * Implements role-based access control (RBAC) with DocType-level permissions
  */
 
@@ -10,32 +10,21 @@ import { PermissionError } from '../core/errors.js';
 /**
  * Permission action types
  */
-export type PermissionAction =
-  | 'read'
-  | 'write'
-  | 'create'
-  | 'delete'
-  | 'submit'
-  | 'cancel'
-  | 'amend';
+export type PermissionAction = 'read' | 'write' | 'create' | 'delete' | 'submit' | 'cancel' | 'amend';
 
 /**
  * User context for permission checks
  */
 export interface UserContext {
-  /** User email */
   email: string;
-  /** User's roles */
   roles: string[];
-  /** Whether user is the owner of the document */
   isOwner?: boolean;
-  /** User's department (for field-level permissions) */
   department?: string;
 }
 
 /**
  * Check if user has permission to perform action on a DocType
- *
+ * 
  * @param doctype - DocType definition
  * @param action - Permission action to check
  * @param user - User context
@@ -46,7 +35,7 @@ export function hasPermission(
   doctype: DocTypeDefinition,
   action: PermissionAction,
   user: UserContext,
-  documentOwner?: string,
+  documentOwner?: string
 ): boolean {
   // System Manager has all permissions
   if (user.roles.includes('System Manager')) {
@@ -57,10 +46,9 @@ export function hasPermission(
   const isOwner = documentOwner ? user.email === documentOwner : false;
 
   // Find applicable permission rules for user's roles
-  const applicablePermissions =
-    doctype.permissions?.filter((perm) => {
-      return user.roles.includes(perm.role);
-    }) ?? [];
+  const applicablePermissions = doctype.permissions?.filter((perm) => {
+    return user.roles.includes(perm.role);
+  }) ?? [];
 
   if (applicablePermissions.length === 0) {
     return false;
@@ -85,7 +73,7 @@ export function hasPermission(
 
 /**
  * Assert that user has permission, throw error if not
- *
+ * 
  * @param doctype - DocType definition
  * @param action - Permission action to check
  * @param user - User context
@@ -96,13 +84,13 @@ export function assertPermission(
   doctype: DocTypeDefinition,
   action: PermissionAction,
   user: UserContext,
-  documentOwner?: string,
+  documentOwner?: string
 ): void {
   if (!hasPermission(doctype, action, user, documentOwner)) {
     throw new PermissionError(
       doctype.name,
       action,
-      `You do not have permission to ${action} ${doctype.name}`,
+      `You do not have permission to ${action} ${doctype.name}`
     );
   }
 }
@@ -133,12 +121,15 @@ function getPermissionForAction(perm: PermissionRule, action: PermissionAction):
 
 /**
  * Get all DocTypes that user has read access to
- *
+ * 
  * @param doctypes - Array of DocType definitions
  * @param user - User context
  * @returns Array of DocType names user can read
  */
-export function getAccessibleDocTypes(doctypes: DocTypeDefinition[], user: UserContext): string[] {
+export function getAccessibleDocTypes(
+  doctypes: DocTypeDefinition[],
+  user: UserContext
+): string[] {
   return doctypes
     .filter((doctype) => hasPermission(doctype, 'read', user))
     .map((doctype) => doctype.name);
@@ -146,7 +137,7 @@ export function getAccessibleDocTypes(doctypes: DocTypeDefinition[], user: UserC
 
 /**
  * Check if user has any permission on a DocType
- *
+ * 
  * @param doctype - DocType definition
  * @param user - User context
  * @returns True if user has any permission
@@ -154,4 +145,61 @@ export function getAccessibleDocTypes(doctypes: DocTypeDefinition[], user: UserC
 export function hasAnyPermission(doctype: DocTypeDefinition, user: UserContext): boolean {
   const actions: PermissionAction[] = ['read', 'write', 'create', 'delete'];
   return actions.some((action) => hasPermission(doctype, action, user));
+}
+
+// ============================================================================
+// Role Hierarchy
+// ============================================================================
+
+/**
+ * Internal cache for role hierarchy
+ */
+const roleHierarchyCache = new Map<string, string[]>();
+
+/**
+ * Get all parent roles recursively
+ *
+ * @param roles - User's direct roles
+ * @param roleHierarchy - Map of role name to parent role
+ * @returns Expanded roles including all parent roles
+ */
+export function getRoleHierarchy(
+  roles: string[],
+  roleHierarchy?: Map<string, string>
+): string[] {
+  if (roles.length === 0) {
+    return [];
+  }
+
+  // Build role hierarchy map if not provided
+  const hierarchy = roleHierarchy ?? new Map<string, string>();
+
+  const expanded = new Set<string>(roles);
+  const visited = new Set<string>();
+
+  function expandRole(role: string): void {
+    if (visited.has(role)) {
+      return; // Prevent circular references
+    }
+    visited.add(role);
+
+    const parent = hierarchy.get(role);
+    if (parent && !visited.has(parent)) {
+      expanded.add(parent);
+      expandRole(parent);
+    }
+  }
+
+  for (const role of roles) {
+    expandRole(role);
+  }
+
+  return Array.from(expanded);
+}
+
+/**
+ * Clear role hierarchy cache
+ */
+export function clearRoleHierarchyCache(): void {
+  roleHierarchyCache.clear();
 }

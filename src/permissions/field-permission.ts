@@ -1,83 +1,10 @@
-import type {
-  DocTypeDefinition,
-  FieldPermissionRule,
-  FieldPermissionLevel,
-} from '../core/doctype/schema.js';
+import type { DocTypeDefinition, FieldPermissionRule } from '../core/doctype/schema.js';
 import { PermissionError } from '../core/errors.js';
 import type { UserContext } from './permission.js';
 
-export type { FieldPermissionRule, FieldPermissionLevel };
+export type { FieldPermissionRule };
 
 type FieldPermissionAction = 'read' | 'write';
-
-function getFieldPermissionRule(
-  doctype: DocTypeDefinition,
-  role: string,
-): FieldPermissionRule | undefined {
-  return doctype.field_permissions?.find((p) => p.role === role);
-}
-
-function getFieldPermlevel(fieldname: string, fieldLevels: FieldPermissionLevel[]): number {
-  const fieldLevel = fieldLevels.find((f) => f.fieldname === fieldname);
-  return fieldLevel?.permlevel ?? 999;
-}
-
-function isReadOnly(fieldname: string, fieldLevels: FieldPermissionLevel[]): boolean {
-  const fieldLevel = fieldLevels.find((f) => f.fieldname === fieldname);
-  return fieldLevel?.read_only ?? false;
-}
-
-export function hasFieldPermission(
-  doctype: DocTypeDefinition,
-  fieldname: string,
-  action: FieldPermissionAction,
-  user: UserContext,
-  fieldLevels: FieldPermissionLevel[],
-  document?: Record<string, unknown>,
-): boolean {
-  const field = doctype.fields.find((f) => f.fieldname === fieldname);
-  if (!field) {
-    return false;
-  }
-
-  if (action === 'write' && (field.read_only || isReadOnly(fieldname, fieldLevels))) {
-    return false;
-  }
-
-  const hasFieldPermissions = doctype.field_permissions && doctype.field_permissions.length > 0;
-
-  if (
-    hasFieldPermissions &&
-    (user.roles.includes('System Manager') || user.roles.includes('Admin'))
-  ) {
-    return true;
-  }
-
-  const fieldPermlevel = getFieldPermlevel(fieldname, fieldLevels);
-
-  for (const role of user.roles) {
-    const rule = getFieldPermissionRule(doctype, role);
-    if (!rule) continue;
-
-    if (fieldPermlevel >= rule.permlevel) {
-      if (action === 'read' && rule.read) {
-        return true;
-      }
-
-      if (action === 'write' && rule.write) {
-        if (rule.condition && document) {
-          if (evaluateCondition(rule.condition, document, user)) {
-            return true;
-          }
-        } else {
-          return true;
-        }
-      }
-    }
-  }
-
-  return false;
-}
 
 function evaluateCondition(
   condition: string,
@@ -96,33 +23,72 @@ function evaluateCondition(
   }
 }
 
-export function getVisibleFields(
+export function hasFieldPermission(
   doctype: DocTypeDefinition,
+  fieldname: string,
+  action: FieldPermissionAction,
   user: UserContext,
-  fieldLevels: FieldPermissionLevel[],
-): string[] {
-  return doctype.fields
-    .filter((field) => hasFieldPermission(doctype, field.fieldname, 'read', user, fieldLevels))
-    .map((field) => field.fieldname);
+  document?: Record<string, unknown>,
+): boolean {
+  const field = doctype.fields.find((f) => f.fieldname === fieldname);
+
+  if (!field) return false;
+
+  if (action === 'write' && field.read_only) {
+    return false;
+  }
+
+  if (user.roles.includes('System Manager') || user.roles.includes('Admin')) {
+    return true;
+  }
+
+  const rule = doctype.field_permissions?.find((r) => user.roles.includes(r.role));
+
+  if (!rule) return false;
+
+  const allowedFields = action === 'read' ? rule.read : rule.write;
+
+  if (allowedFields.includes('*')) return true;
+
+  const hasAccess = allowedFields.includes(fieldname);
+
+  if (hasAccess && rule.condition && document) {
+    return evaluateCondition(rule.condition, document, user);
+  }
+
+  return hasAccess;
 }
 
-export function getEditableFields(
-  doctype: DocTypeDefinition,
-  user: UserContext,
-  fieldLevels: FieldPermissionLevel[],
-): string[] {
-  return doctype.fields
-    .filter((field) => hasFieldPermission(doctype, field.fieldname, 'write', user, fieldLevels))
-    .map((field) => field.fieldname);
+export function getVisibleFields(doctype: DocTypeDefinition, user: UserContext): string[] {
+  const rule = doctype.field_permissions?.find((r) => user.roles.includes(r.role));
+
+  if (!rule) return [];
+
+  if (rule.read.includes('*')) {
+    return doctype.fields.map((f) => f.fieldname);
+  }
+
+  return rule.read;
+}
+
+export function getEditableFields(doctype: DocTypeDefinition, user: UserContext): string[] {
+  const rule = doctype.field_permissions?.find((r) => user.roles.includes(r.role));
+
+  if (!rule) return [];
+
+  if (rule.write.includes('*')) {
+    return doctype.fields.filter((f) => !f.read_only).map((f) => f.fieldname);
+  }
+
+  return rule.write;
 }
 
 export function filterDocumentByFieldPermissions(
   doctype: DocTypeDefinition,
   document: Record<string, unknown>,
   user: UserContext,
-  fieldLevels: FieldPermissionLevel[],
 ): Record<string, unknown> {
-  const visibleFields = getVisibleFields(doctype, user, fieldLevels);
+  const visibleFields = getVisibleFields(doctype, user);
   const filtered: Record<string, unknown> = {};
 
   for (const fieldname of visibleFields) {
@@ -139,7 +105,7 @@ export function assertFieldPermission(
   fieldname: string,
   action: FieldPermissionAction,
   user: UserContext,
-  fieldLevels: FieldPermissionLevel[],
+  document?: Record<string, unknown>,
 ): void {
   const field = doctype.fields.find((f) => f.fieldname === fieldname);
   if (!field) {
@@ -150,7 +116,7 @@ export function assertFieldPermission(
     );
   }
 
-  if (!hasFieldPermission(doctype, fieldname, action, user, fieldLevels)) {
+  if (!hasFieldPermission(doctype, fieldname, action, user, document)) {
     throw new PermissionError(
       doctype.name,
       action,

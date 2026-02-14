@@ -40,6 +40,13 @@
       "default": true,
       "read_only": true,
       "description": "Whether this is a custom role (vs system role)"
+    },
+    {
+      "fieldname": "parent_role",
+      "fieldtype": "Link",
+      "label": "Parent Role",
+      "options": "Role",
+      "description": "Parent role whose permissions will be inherited"
     }
   ],
   "permissions": [

@@ -55,22 +55,13 @@ export interface PermissionRule {
 
 /**
  * Field-level permission rule
+ * Uses direct field list model (Plan A)
  */
 export interface FieldPermissionRule {
   role: string;
-  permlevel: number;
-  read: boolean;
-  write: boolean;
+  read: string[]; // 可读字段列表，['*'] 表示所有字段
+  write: string[]; // 可写字段列表，['*'] 表示所有字段
   condition?: string;
-}
-
-/**
- * Field permission level (threshold for field access)
- */
-export interface FieldPermissionLevel {
-  fieldname: string;
-  permlevel: number;
-  read_only?: boolean;
 }
 
 export interface DocTypeDefinition {
@@ -214,13 +205,17 @@ export function parseDocType(raw: unknown): DocTypeDefinition {
   // Parse field_permissions
   const rawFieldPermissions = raw['field_permissions'];
   const fieldPermissions: FieldPermissionRule[] = Array.isArray(rawFieldPermissions)
-    ? rawFieldPermissions.map((p) => ({
-        role: String((p as Record<string, unknown>)['role']),
-        permlevel: Number((p as Record<string, unknown>)['permlevel']) || 0,
-        read: Boolean((p as Record<string, unknown>)['read']),
-        write: Boolean((p as Record<string, unknown>)['write']),
-        condition: (p as Record<string, unknown>)['condition'] as string | undefined,
-      }))
+    ? rawFieldPermissions.map((p) => {
+        const raw = p as Record<string, unknown>;
+        const read = raw['read'];
+        const write = raw['write'];
+        return {
+          role: String(raw['role']),
+          read: Array.isArray(read) ? read as string[] : read === '*' ? ['*'] : [],
+          write: Array.isArray(write) ? write as string[] : write === '*' ? ['*'] : [],
+          condition: raw['condition'] as string | undefined,
+        };
+      })
     : [];
 
   return {
