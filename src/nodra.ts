@@ -6,6 +6,8 @@
  */
 
 import Fastify, { type FastifyInstance } from 'fastify';
+import swagger from '@fastify/swagger';
+import swaggerUi from '@fastify/swagger-ui';
 import type { NodraConfig } from './core/config.js';
 import { Database } from './database/connection.js';
 import { DocTypeRegistry } from './core/doctype/registry.js';
@@ -56,7 +58,33 @@ export class Nodra {
     // 2. Create Fastify server with plugins and routes
     this.server = Fastify({ logger: false });
     errorHandlerPlugin(this.server);
-    resourceRoutes(this.server, this.orm, this.registry);
+
+    // Register Swagger UI
+    await this.server.register(swagger, {
+      openapi: {
+        info: {
+          title: 'Nodra API',
+          description: 'Metadata-driven web framework API',
+          version: '1.0.0',
+        },
+        servers: [{ url: `http://localhost:${this.config.server.port}` }],
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: 'http',
+              scheme: 'bearer',
+              bearerFormat: 'JWT',
+            },
+          },
+        },
+      },
+    });
+
+    await this.server.register(swaggerUi, {
+      routePrefix: '/api/docs/ui',
+    });
+
+    resourceRoutes(this.server, this.orm, this.registry, this.db);
     
     // Register auth routes
     authRoutes(this.server, this.orm, this.registry, {

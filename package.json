@@ -59,14 +59,18 @@
   },
   "dependencies": {
     "@fastify/multipart": "^9.4.0",
+    "@fastify/swagger": "^9.7.0",
+    "@fastify/swagger-ui": "^5.2.5",
     "@fastify/websocket": "^11.2.0",
     "argon2": "^0.44.0",
     "chalk": "^5.6.2",
     "commander": "^14.0.3",
     "fastify": "^5.7.4",
+    "json2csv": "6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.18.0",
     "pino": "^10.3.0",
-    "ws": "^8.19.0"
+    "ws": "^8.19.0",
+    "xlsx": "^0.18.5"
   }
 }

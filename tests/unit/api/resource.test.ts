@@ -6,6 +6,7 @@ import { NotFoundError } from '../../../src/core/errors.js';
 import type { ORM } from '../../../src/orm/crud.js';
 import type { DocTypeRegistry } from '../../../src/core/doctype/registry.js';
 import type { DocTypeDefinition } from '../../../src/core/doctype/schema.js';
+import type { Database } from '../../../src/database/connection.js';
 
 // ---------------------------------------------------------------------------
 // Test helpers & fixtures
@@ -91,10 +92,21 @@ function createMockRegistry(knownDocTypes: string[] = ['Todo']): DocTypeRegistry
   } as unknown as DocTypeRegistry;
 }
 
-function buildApp(orm: ORM, registry: DocTypeRegistry) {
+function createMockDb(): Database {
+  return {
+    query: vi.fn().mockResolvedValue([]),
+    queryOne: vi.fn().mockResolvedValue(null),
+    execute: vi.fn().mockResolvedValue(0),
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    withTransaction: vi.fn(),
+  } as unknown as Database;
+}
+
+function buildApp(orm: ORM, registry: DocTypeRegistry, db: Database) {
   const app = Fastify();
   errorHandlerPlugin(app);
-  resourceRoutes(app, orm, registry);
+  resourceRoutes(app, orm, registry, db);
   return app;
 }
 
@@ -105,10 +117,12 @@ function buildApp(orm: ORM, registry: DocTypeRegistry) {
 describe('resourceRoutes', () => {
   let orm: ORM;
   let registry: DocTypeRegistry;
+  let db: Database;
 
   beforeEach(() => {
     orm = createMockOrm();
     registry = createMockRegistry(['Todo']);
+    db = createMockDb();
   });
 
   // -------------------------------------------------------------------------
@@ -124,7 +138,7 @@ describe('resourceRoutes', () => {
       vi.mocked(orm.getList).mockResolvedValue(docs as never);
       vi.mocked(orm.getCount).mockResolvedValue(2);
 
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       const res = await app.inject({ method: 'GET', url: '/api/resource/Todo' });
 
       expect(res.statusCode).toBe(200);
@@ -137,7 +151,7 @@ describe('resourceRoutes', () => {
       vi.mocked(orm.getList).mockResolvedValue([]);
       vi.mocked(orm.getCount).mockResolvedValue(0);
 
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       await app.inject({
         method: 'GET',
         url: '/api/resource/Todo?limit_page_length=5&limit_start=10',
@@ -153,7 +167,7 @@ describe('resourceRoutes', () => {
       vi.mocked(orm.getList).mockResolvedValue([]);
       vi.mocked(orm.getCount).mockResolvedValue(0);
 
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       await app.inject({
         method: 'GET',
         url: '/api/resource/Todo?fields=name,title,status',
@@ -169,7 +183,7 @@ describe('resourceRoutes', () => {
       vi.mocked(orm.getList).mockResolvedValue([]);
       vi.mocked(orm.getCount).mockResolvedValue(0);
 
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       const filters = JSON.stringify({ status: 'Open' });
       await app.inject({
         method: 'GET',
@@ -186,7 +200,7 @@ describe('resourceRoutes', () => {
       vi.mocked(orm.getList).mockResolvedValue([]);
       vi.mocked(orm.getCount).mockResolvedValue(0);
 
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       await app.inject({
         method: 'GET',
         url: '/api/resource/Todo?order_by=creation desc',
@@ -199,7 +213,7 @@ describe('resourceRoutes', () => {
     });
 
     it('should return 404 for unregistered doctype', async () => {
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       const res = await app.inject({ method: 'GET', url: '/api/resource/Unknown' });
 
       expect(res.statusCode).toBe(404);
@@ -215,7 +229,7 @@ describe('resourceRoutes', () => {
       const doc = makeMockDoc({ name: 'a1', title: 'My Task', status: 'Open' });
       vi.mocked(orm.getDoc).mockResolvedValue(doc as never);
 
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       const res = await app.inject({ method: 'GET', url: '/api/resource/Todo/a1' });
 
       expect(res.statusCode).toBe(200);
@@ -226,14 +240,14 @@ describe('resourceRoutes', () => {
     it('should return 404 when document not found', async () => {
       vi.mocked(orm.getDoc).mockRejectedValue(new NotFoundError('Todo', 'nope'));
 
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       const res = await app.inject({ method: 'GET', url: '/api/resource/Todo/nope' });
 
       expect(res.statusCode).toBe(404);
     });
 
     it('should return 404 for unregistered doctype', async () => {
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       const res = await app.inject({ method: 'GET', url: '/api/resource/Unknown/abc' });
 
       expect(res.statusCode).toBe(404);
@@ -249,7 +263,7 @@ describe('resourceRoutes', () => {
       const doc = makeMockDoc({ name: 'new1', title: 'New Task', status: 'Open' });
       vi.mocked(orm.insert).mockResolvedValue(doc as never);
 
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       const res = await app.inject({
         method: 'POST',
         url: '/api/resource/Todo',
@@ -262,7 +276,7 @@ describe('resourceRoutes', () => {
     });
 
     it('should return 404 for unregistered doctype', async () => {
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       const res = await app.inject({
         method: 'POST',
         url: '/api/resource/Unknown',
@@ -285,7 +299,7 @@ describe('resourceRoutes', () => {
         makeMockDoc({ name: 'a1', title: 'Updated', status: 'Closed' }) as never,
       );
 
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       const res = await app.inject({
         method: 'PUT',
         url: '/api/resource/Todo/a1',
@@ -298,7 +312,7 @@ describe('resourceRoutes', () => {
     });
 
     it('should return 404 for unregistered doctype', async () => {
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       const res = await app.inject({
         method: 'PUT',
         url: '/api/resource/Unknown/abc',
@@ -317,7 +331,7 @@ describe('resourceRoutes', () => {
     it('should delete a document and return message', async () => {
       vi.mocked(orm.deleteDoc).mockResolvedValue(undefined);
 
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       const res = await app.inject({ method: 'DELETE', url: '/api/resource/Todo/a1' });
 
       expect(res.statusCode).toBe(200);
@@ -327,7 +341,7 @@ describe('resourceRoutes', () => {
     });
 
     it('should return 404 for unregistered doctype', async () => {
-      const app = buildApp(orm, registry);
+      const app = buildApp(orm, registry, db);
       const res = await app.inject({ method: 'DELETE', url: '/api/resource/Unknown/abc' });
 
       expect(res.statusCode).toBe(404);
